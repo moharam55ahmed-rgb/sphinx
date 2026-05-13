@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160" fill="none">
+  <!-- Sphinx Icon (geometric outline) -->
+  <!-- Building towers / crown -->
+  <g stroke="white" stroke-width="2" fill="none">
+    <!-- Left tower -->
+    <rect x="110" y="8" width="10" height="32" rx="1"/>
+    <rect x="106" y="16" width="4" height="24" rx="0.5"/>
+    <!-- Center tower (tallest) -->
+    <rect x="124" y="4" width="12" height="36" rx="1"/>
+    <rect x="128" y="2" width="4" height="10" rx="0.5"/>
+    <!-- Right tower -->
+    <rect x="140" y="8" width="10" height="32" rx="1"/>
+    <rect x="150" y="16" width="4" height="24" rx="0.5"/>
+    
+    <!-- Wings -->
+    <path d="M80 55 Q90 35 110 32 L115 35 Q100 42 92 60Z" stroke-width="1.5"/>
+    <path d="M80 55 Q75 65 78 72 L88 68 Q84 62 88 56Z" stroke-width="1.5"/>
+    <path d="M240 55 Q230 35 150 32 L145 35 Q160 42 168 60Z" stroke-width="1.5"/>
+    <path d="M240 55 Q245 65 242 72 L232 68 Q236 62 232 56Z" stroke-width="1.5"/>
+    
+    <!-- X cross detail on wings -->
+    <line x1="88" y1="40" x2="108" y2="60" stroke-width="1.5"/>
+    <line x1="88" y1="60" x2="108" y2="40" stroke-width="1.5"/>
+    <line x1="152" y1="40" x2="172" y2="60" stroke-width="1.5"/>
+    <line x1="152" y1="60" x2="172" y2="40" stroke-width="1.5"/>
+    
+    <!-- Body -->
+    <path d="M105 60 Q90 62 85 72 L85 80 L235 80 L235 72 Q230 62 215 60Z" stroke-width="1.5"/>
+    
+    <!-- Head -->
+    <ellipse cx="210" cy="52" rx="18" ry="16" stroke-width="1.5"/>
+    <!-- Headdress -->
+    <path d="M196 44 L196 36 L202 38 M224 44 L224 36 L218 38" stroke-width="1.5"/>
+    <line x1="196" y1="36" x2="224" y2="36" stroke-width="1.5"/>
+    <!-- Face features -->
+    <line x1="204" y1="50" x2="208" y2="52" stroke-width="1"/>
+    <line x1="214" y1="52" x2="218" y2="50" stroke-width="1"/>
+    <path d="M205 57 Q210 60 215 57" stroke-width="1"/>
+    
+    <!-- Front paws -->
+    <path d="M85 80 L88 90 L110 90 L112 80" stroke-width="1.5"/>
+    <path d="M200 80 L198 90 L220 90 L222 80" stroke-width="1.5"/>
+    
+    <!-- Tail -->
+    <path d="M85 75 Q70 70 65 60 Q62 50 68 45" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Arabic text -->
+  <text x="160" y="115" text-anchor="middle" font-family="Cairo, Tajawal, sans-serif" font-size="15" font-weight="700" fill="white">سفنكس للتطوير العقاري</text>
+  
+  <!-- SPHINX text -->
+  <text x="160" y="134" text-anchor="middle" font-family="'Arial', sans-serif" font-size="20" font-weight="900" letter-spacing="4" fill="white">SPHINX</text>
+  
+  <!-- Subtitle -->
+  <text x="160" y="148" text-anchor="middle" font-family="'Arial', sans-serif" font-size="7" font-weight="400" letter-spacing="3" fill="white">REAL ESTATE DEVELOPMENT</text>
+</svg>

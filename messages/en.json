@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "title": "SPHINX Real Estate Development | Premium Real Estate Investment",
+    "description": "SPHINX Real Estate Development offers commercial, administrative, and medical real estate projects in El Shorouk City with a modern vision and trusted investment opportunities."
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "projects": "Projects",
+    "gallery": "Gallery",
+    "news": "Latest News",
+    "team": "Team",
+    "careers": "Careers",
+    "contact": "Contact Us",
+    "photos": "Photo Gallery",
+    "videos": "Videos"
+  },
+  "cta": {
+    "contactUs": "Contact Us",
+    "exploreProjects": "Explore Projects",
+    "learnMore": "Learn More",
+    "viewDetails": "View Details",
+    "submitApplication": "Submit Application",
+    "submit": "Submit",
+    "contactNow": "Contact Us Now",
+    "applyNow": "Apply Now"
+  },
+  "hero": {
+    "slide1": {
+      "title": "SPHINX Real Estate Development",
+      "subtitle": "Simplifying real estate investment with a modern vision and trusted opportunities."
+    },
+    "slide2": {
+      "title": "Mercado Mall",
+      "subtitle": "A fully integrated commercial mall in El Shorouk City."
+    },
+    "slide3": {
+      "title": "Arena Mall",
+      "subtitle": "A successful investment opportunity in a strategic location."
+    },
+    "slide4": {
+      "title": "City Hub Mall",
+      "subtitle": "A premium investment destination in El Shorouk City."
+    },
+    "slide5": {
+      "title": "Solaria Mall",
+      "subtitle": "A new light of life, business, and investment."
+    }
+  },
+  "sections": {
+    "investmentSimplicity": "Investment Simplicity",
+    "investmentTitle": "Clearer and more reliable real estate investment",
+    "investmentDesc": "We provide an integrated investment experience built around strategic locations, modern architecture, and diverse commercial, administrative, and medical units tailored to different investment goals.",
+    "aboutUs": "About Us",
+    "aboutTitle": "SPHINX Real Estate Development",
+    "aboutDesc": "SPHINX Real Estate Development was established to introduce a modern vision to the real estate market, backed by extensive experience across residential, commercial, administrative, medical, industrial, and resort developments. The company focuses on professional project management, maximizing investment value, increasing customer satisfaction, and creating new opportunities for investment and employment.",
+    "aboutLong": "SPHINX Real Estate Development was founded as an extension of long-standing expertise in real estate development and project management. The company combines investment vision, execution quality, and strategic location selection. It develops residential, commercial, administrative, medical, industrial, and resort projects while focusing on delivering real value to clients and investors.",
+    "vision": "Vision",
+    "visionDesc": "To establish a strong footprint in the real estate development market through excellence, trust, and reliable investment opportunities.",
+    "mission": "Mission",
+    "missionDesc": "To become one of the leading real estate developers in Egypt and the Arab region through innovation, quality execution, and professional project management.",
+    "values": "Values",
+    "valuesItems": ["Honesty", "Trust", "Responsibility", "Customer Satisfaction", "Quality"],
+    "projects": "Projects",
+    "whyInvest": "Why Invest With Us?",
+    "whyInvestItems": [
+      "Strategic Locations",
+      "Mixed-use Developments",
+      "Real Estate Experience",
+      "Flexible Investment Opportunities",
+      "Modern Architectural Designs",
+      "Professional Project Management"
+    ],
+    "latestNews": "Latest News",
+    "ctaTitle": "Do you have a question or inquiry?",
+    "ctaDesc": "Contact us and our specialized team will discuss your request with you.",
+    "photoGallery": "Photo Gallery",
+    "videosGallery": "Videos",
+    "ourTeam": "Our Team",
+    "teamIntro": "A specialized team combining real estate expertise and professional management to deliver trusted investment opportunities and an integrated development experience.",
+    "careersTitle": "Careers",
+    "careersIntro": "Join our team and be part of our growth journey",
+    "contactTitle": "Contact Us"
+  },
+  "stats": {
+    "years": "Years of Experience",
+    "projects": "Projects",
+    "clients": "Clients",
+    "units": "Units and Investment Opportunities"
+  },
+  "filters": {
+    "all": "All",
+    "commercial": "Commercial",
+    "administrative": "Administrative",
+    "medical": "Medical",
+    "mixedUse": "Mixed-use"
+  },
+  "newsCategories": {
+    "realEstate": "Real Estate",
+    "investment": "Investment",
+    "projects": "Projects",
+    "exhibitions": "Exhibitions"
+  },
+  "form": {
+    "name": "Name",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "requestType": "Request Type",
+    "unitType": "Unit Type",
+    "preferredMall": "Preferred Mall",
+    "message": "Message",
+    "cv": "CV",
+    "desiredPosition": "Desired Position",
+    "rent": "Rent",
+    "purchase": "Purchase",
+    "shop": "Shop",
+    "clinic": "Clinic",
+    "office": "Office",
+    "retailStore": "Retail Store",
+    "restaurant": "Restaurant",
+    "other": "Other"
+  },
+  "malls": {
+    "arena": "Arena",
+    "solaria": "Solaria",
+    "mercado": "Mercado",
+    "cityHub": "City Hub"
+  },
+  "footer": {
+    "about": "SPHINX Real Estate Development specializes in developing and managing real estate projects, offering integrated investment opportunities in strategic locations with modern designs and professional management.",
+    "quickLinks": "Quick Links",
+    "ourProjects": "Our Projects",
+    "contactInfo": "Contact Info",
+    "copyright": "All rights reserved to SPHINX Real Estate Development 2026"
+  },
+  "common": {
+    "watchVideo": "Watch Video",
+    "viewAll": "View All",
+    "readMore": "Read More",
+    "similarProjects": "Similar Projects",
+    "quickFacts": "Quick Facts",
+    "postedOn": "Posted on",
+    "noResults": "No results found",
+    "loading": "Loading...",
+    "search": "Search"
+  }
+}
