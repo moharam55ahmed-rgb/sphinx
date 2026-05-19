@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  CONTENT_MANAGER
+  SEO_MARKETING
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id          String     @id @default(uuid())
+  name        String
+  email       String     @unique
+  password    String
+  role        Role       @default(CONTENT_MANAGER)
+  status      UserStatus @default(ACTIVE)
+  lastLoginAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Page {
+  id          String        @id @default(uuid())
+  title       Json          // { en: string, ar: string }
+  slug        String        @unique
+  templateKey String        @default("default")
+  status      String        @default("published")
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  sections    PageSection[]
+}
+
+model PageSection {
+  id              String   @id @default(uuid())
+  pageId          String
+  page            Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sectionKey      String
+  sectionName     String
+  title           Json?    // { en: string, ar: string }
+  subtitle        Json?    // { en: string, ar: string }
+  description     Json?    // Store as JSON string or handle carefully
+  buttonText      Json?    // { en: string, ar: string }
+  buttonUrl       String?
+  image           String?
+  backgroundImage String?
+  videoUrl        String?
+  customData      Json?    // Flexible JSON for cards, lists, tabs, etc.
+  sortOrder       Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Project {
+  id               String          @id @default(uuid())
+  title            Json            // { en: string, ar: string }
+  slug             String          @unique
+  shortDescription Json?           // { en: string, ar: string }
+  description      Json?           
+  categoryId       String?
+  category         ProjectCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  mainImage        String?
+  gallery          Json?           // Array of image URLs
+  clientName       String?
+  location         String?
+  projectDate      String?
+  projectUrl       String?
+  technologies     Json?           // Array of strings
+  features         Json?           // Array of strings/objects
+  status           String          @default("published")
+  isFeatured       Boolean         @default(false)
+  sortOrder        Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model ProjectCategory {
+  id          String    @id @default(uuid())
+  name        Json      // { en: string, ar: string }
+  slug        String    @unique
+  description Json?     
+  image       String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  projects    Project[]
+}
+
+model NewsCategory {
+  id        String   @id @default(uuid())
+  name      Json
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryCategory {
+  id        String   @id @default(uuid())
+  name      Json
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  media     Media[]
+}
+
+model Media {
+  id                String           @id @default(uuid())
+  fileName          String
+  originalName      String
+  fileUrl           String
+  mimeType          String
+  size              Int
+  altText           String?
+  title             String?
+  showInGallery     Boolean          @default(false)
+  galleryCategoryId String?
+  galleryCategory   GalleryCategory? @relation(fields: [galleryCategoryId], references: [id], onDelete: SetNull)
+  uploadedBy        String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+model WebsiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  group     String   @default("general")
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SeoMeta {
+  id                 String   @id @default(uuid())
+  pageType           String   // 'page', 'project', 'category'
+  pageId             String
+  slug               String   @unique
+  metaTitle          String?
+  metaDescription    String?  @db.Text
+  metaKeywords       String?  @db.Text
+  canonicalUrl       String?
+  ogTitle            String?
+  ogDescription      String?  @db.Text
+  ogImage            String?
+  twitterTitle       String?
+  twitterDescription String?  @db.Text
+  twitterImage       String?
+  schemaJson         Json?
+  robotsIndex        Boolean  @default(true)
+  robotsFollow       Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([pageType, pageId])
+}
+
+model Redirect {
+  id         String   @id @default(uuid())
+  fromUrl    String   @unique
+  toUrl      String
+  statusCode Int      @default(301)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model NavigationItem {
+  id           String   @id @default(uuid())
+  label        Json
+  url          String
+  parentId     String?
+  location     String   @default("header") // 'header', 'footer', 'mobile'
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  openInNewTab Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  status    String   @default("unread") // 'unread', 'read', 'archived'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PageVisit {
+  id        String   @id @default(uuid())
+  path      String
+  locale    String   @default("en")
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+  @@map("page_visits")
+}
+
+model News {
+  id               String   @id @default(uuid())
+  title            Json     // { en: string, ar: string }
+  slug             String   @unique
+  content          Json     // { en: string, ar: string }
+  excerpt          Json?    // { en: string, ar: string }
+  mainImage        String?
+  category         String   @default("projects") // real-estate | investment | projects | exhibitions
+  status           String   @default("published") // published, draft
+  publishedAt      DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("news")
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,7 +11,9 @@ import { PageHero } from '@/components/shared/PageHero';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
-import { videos, projects } from '@/data/site';
+import { videos } from '@/data/site';
+import { getGallery, getGalleryCategories } from '@/lib/public-api';
+import { t as translate } from '@/lib/translate';
 
 export function VideosGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -21,17 +23,73 @@ export function VideosGallery() {
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
-  const filters = [
-    { value: 'all', label: tFilters('all') },
-    ...projects.map((p) => ({
-      value: p.slug,
-      label: isRtl ? p.nameAr : p.nameEn,
-    })),
-  ];
+  const [filters, setFilters] = useState([{ value: 'all', label: tFilters('all') }]);
+  const [videoItems, setVideoItems] = useState(videos);
+  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
 
-  const filteredVideos = activeFilter === 'all'
-    ? videos
-    : videos.filter((v) => v.project === activeFilter);
+  useEffect(() => {
+    getGalleryCategories()
+      .then((cats) => {
+        if (cats?.length) {
+          setFilters([
+            { value: 'all', label: tFilters('all') },
+            ...cats.map((cat: any) => ({
+              value: cat.slug,
+              label: translate(cat.name, locale),
+            })),
+          ]);
+        }
+      })
+      .catch(() => {});
+  }, [locale, tFilters]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getGallery({
+          type: 'video',
+          category: activeFilter !== 'all' ? activeFilter : undefined,
+        });
+        if (data?.length) {
+          setVideoItems(
+            data.map((item: any) => {
+              let titleObj = item.title;
+              if (typeof titleObj === 'string') {
+                try {
+                  titleObj = JSON.parse(titleObj);
+                } catch {
+                  titleObj = { en: titleObj, ar: titleObj };
+                }
+              }
+              return {
+                id: item.id,
+                titleAr:
+                  typeof titleObj === 'object' ? titleObj.ar : item.originalName,
+                titleEn:
+                  typeof titleObj === 'object' ? titleObj.en : item.originalName,
+                thumbnail: item.fileUrl || '/images/video-thumbnail.jpg',
+                fileUrl: item.fileUrl,
+                youtubeId: 'dQw4w9WgXcQ',
+                project: item.galleryCategory?.slug || 'all',
+              };
+            })
+          );
+        } else if (activeFilter === 'all') {
+          setVideoItems(videos);
+        } else {
+          setVideoItems([]);
+        }
+      } catch (err) {
+        console.error('Failed to load gallery videos', err);
+      }
+    };
+    load();
+  }, [activeFilter]);
+
+  const filteredVideos =
+    activeFilter === 'all'
+      ? videoItems
+      : videoItems.filter((v) => v.project === activeFilter);
 
   return (
     <>
@@ -76,7 +134,10 @@ export function VideosGallery() {
                     'glass-card rounded-xl overflow-hidden cursor-pointer group',
                     isRtl && 'text-right'
                   )}
-                  onClick={() => setSelectedVideo(video.youtubeId)}
+                  onClick={() => {
+                    if (video.youtubeId) setSelectedVideo(video.youtubeId);
+                    else if (video.fileUrl) setSelectedFileUrl(video.fileUrl);
+                  }}
                 >
                   <div className="relative aspect-video overflow-hidden">
                     <Image
@@ -108,19 +169,25 @@ export function VideosGallery() {
 
       {/* Video Modal */}
       <AnimatePresence>
-        {selectedVideo && (
+        {(selectedVideo || selectedFileUrl) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-            onClick={() => setSelectedVideo(null)}
+            onClick={() => {
+              setSelectedVideo(null);
+              setSelectedFileUrl(null);
+            }}
           >
             <Button
               variant="ghost"
               size="icon"
               className="absolute top-4 right-4 text-white hover:bg-white/10"
-              onClick={() => setSelectedVideo(null)}
+              onClick={() => {
+                setSelectedVideo(null);
+                setSelectedFileUrl(null);
+              }}
             >
               <X className="w-8 h-8" />
             </Button>
@@ -132,9 +199,18 @@ export function VideosGallery() {
               className="w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-full h-full flex items-center justify-center text-white">
-                <p>{isRtl ? 'فيديو يوتيوب' : 'YouTube Video'}</p>
-              </div>
+              {selectedFileUrl ? (
+                <video
+                  src={selectedFileUrl}
+                  controls
+                  autoPlay
+                  className="w-full h-full"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white">
+                  <p>{isRtl ? 'فيديو يوتيوب' : 'YouTube Video'}</p>
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

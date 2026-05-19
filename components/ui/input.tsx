@@ -2,7 +2,20 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+function Input({
+  className,
+  type,
+  value,
+  onChange,
+  readOnly,
+  ...props
+}: React.ComponentProps<'input'>) {
+  const isValueProvided = value !== undefined
+  const coercedValue = value === null ? '' : value
+  const isControlled = isValueProvided
+  const shouldBeReadOnly =
+    isControlled && onChange === undefined && readOnly !== false
+
   return (
     <input
       type={type}
@@ -14,6 +27,9 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         className,
       )}
       {...props}
+      onChange={onChange}
+      readOnly={shouldBeReadOnly || readOnly}
+      {...(isValueProvided ? { value: coercedValue } : {})}
     />
   )
 }

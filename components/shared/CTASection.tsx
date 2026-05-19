@@ -5,12 +5,18 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { AnimatedReveal } from './AnimatedReveal';
+import { t as translate } from '@/lib/translate';
 
-export function CTASection() {
+export function CTASection({ data }: { data?: any }) {
   const t = useTranslations('sections');
   const tCta = useTranslations('cta');
   const locale = useLocale();
   const isRtl = locale === 'ar';
+
+  const ctaTitle = data?.title ? translate(data.title, locale) : t('ctaTitle');
+  const ctaDesc = data?.description
+    ? translate(data.description, locale)
+    : t('ctaDesc');
 
   return (
     <section className="relative py-32 overflow-hidden">
@@ -23,7 +29,7 @@ export function CTASection() {
         priority={false}
       />
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/55 dark:bg-background/80 backdrop-blur-sm" />
       {/* Gold gradient accent */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
 
@@ -31,10 +37,10 @@ export function CTASection() {
         <AnimatedReveal>
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 text-balance">
-              {t('ctaTitle')}
+              {ctaTitle}
             </h2>
             <p className="text-lg text-white/70 mb-8 text-pretty">
-              {t('ctaDesc')}
+              {ctaDesc}
             </p>
             <Link href="/contact">
               <Button

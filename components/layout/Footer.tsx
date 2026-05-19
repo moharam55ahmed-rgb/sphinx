@@ -1,134 +1,307 @@
 'use client';
 
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
-import { Facebook, Youtube, Instagram, Phone, Mail, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { projects, contactInfo, socialLinks } from '@/data/site';
+import { Link, usePathname } from '@/i18n/routing';
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+} from 'lucide-react';
+import { getSettings, getNavigation, getProjects } from '@/lib/public-api';
+import { t as translate } from '@/lib/translate';
+import {
+  mapApiNavigation,
+  getDefaultFooterNav,
+  navLabel,
+  type NavLink,
+} from '@/lib/navigation';
+import { projects, contactInfo, socialLinks as staticSocial } from '@/data/site';
+import { SiteLogo, resolveSiteLogoUrl } from './SiteLogo';
 
 export function Footer() {
   const t = useTranslations('footer');
   const tNav = useTranslations('nav');
   const locale = useLocale();
   const isRtl = locale === 'ar';
+  const pathname = usePathname();
 
-  const quickLinks = [
-    { href: '/', label: tNav('home') },
-    { href: '/about', label: tNav('about') },
-    { href: '/projects', label: tNav('projects') },
-    { href: '/news', label: tNav('news') },
-    { href: '/careers', label: tNav('careers') },
-    { href: '/contact', label: tNav('contact') },
-  ];
+  const [settings, setSettings] = useState<any>(null);
+  const [quickLinks, setQuickLinks] = useState<NavLink[]>(getDefaultFooterNav(tNav));
+  const [footerProjects, setFooterProjects] = useState(projects);
+
+  useEffect(() => {
+    if (pathname.startsWith('/admin')) return;
+
+    const fetchFooterData = async () => {
+      try {
+        const [settingsData, navData, projectsData] = await Promise.all([
+          getSettings(),
+          getNavigation('footer').catch(() => []),
+          getProjects({ limit: 10 }).catch(() => []),
+        ]);
+        setSettings(settingsData);
+
+        if (navData?.length) {
+          setQuickLinks(mapApiNavigation(navData, locale));
+        } else {
+          setQuickLinks(getDefaultFooterNav(tNav));
+        }
+
+        if (projectsData?.length) {
+          setFooterProjects(projectsData);
+        }
+      } catch (err) {
+        console.error('Failed to fetch footer data', err);
+        setQuickLinks(getDefaultFooterNav(tNav));
+      }
+    };
+    fetchFooterData();
+  }, [pathname, locale, tNav]);
+
+  if (pathname.startsWith('/admin')) return null;
+
+  const socialRaw = settings?.socialLinks ?? settings?.social;
+  let apiSocial: Record<string, string> = {};
+  if (socialRaw && typeof socialRaw === 'object' && !('text' in socialRaw)) {
+    apiSocial = socialRaw as Record<string, string>;
+  } else if (typeof socialRaw === 'string') {
+    try {
+      apiSocial = JSON.parse(socialRaw);
+    } catch {
+      apiSocial = {};
+    }
+  }
+
+  const social = {
+    facebook: apiSocial.facebook || staticSocial.facebook,
+    youtube: apiSocial.youtube || staticSocial.youtube,
+    instagram: apiSocial.instagram || staticSocial.instagram,
+    twitter: apiSocial.twitter || staticSocial.twitter,
+    linkedin: apiSocial.linkedin || staticSocial.linkedin,
+  };
+
+  const addressField =
+    locale === 'ar' ? settings?.addressAr : settings?.addressEn;
 
   return (
-    <footer className="bg-secondary border-t border-border">
-      <div className="container mx-auto px-4 py-16">
-        {/*
-          Grid columns flow in reading direction automatically with dir attribute.
-          In RTL: first column → FAR RIGHT, last → FAR LEFT
-          In LTR: first column → FAR LEFT, last → FAR RIGHT
-          Logo column is first → appears on RIGHT in Arabic ✓
-        */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-
-          {/* Column 1: Logo + About — RIGHT in Arabic */}
+    <footer className="bg-secondary/20 border-t border-border pt-20 pb-10">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          {/* Company Info — logo + about + social (RTL via html dir) */}
           <div className="space-y-5">
             <Link href="/" className="inline-block">
-              <Image
-                src="/images/sphinx-logo-final.png"
-                alt={isRtl ? 'سفنكس للتطوير العقاري' : 'SPHINX Real Estate Development'}
+              <SiteLogo
+                logoUrl={resolveSiteLogoUrl(settings?.logo)}
+                alt={
+                  isRtl
+                    ? 'سفنكس للتطوير العقاري'
+                    : 'SPHINX Real Estate Development'
+                }
                 width={200}
                 height={56}
-                className="h-16 w-auto object-contain dark:mix-blend-screen mix-blend-multiply dark:invert-0 invert"
+                className="h-16"
               />
             </Link>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {t('about')}
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              {settings?.aboutText
+                ? translate(settings.aboutText, locale)
+                : t('about')}
             </p>
-            {/* Social icons — flex-row, in RTL they flow right→left automatically */}
             <div className="flex gap-3">
-              <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/60 hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Facebook">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/60 hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="YouTube">
-                <Youtube className="w-5 h-5" />
-              </a>
-              <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/60 hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Instagram">
-                <Instagram className="w-5 h-5" />
-              </a>
+              {social.facebook && (
+                <a
+                  href={social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+              )}
+              {social.youtube && (
+                <a
+                  href={social.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
+              )}
+              {social.instagram && (
+                <a
+                  href={social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+              )}
+              {social.twitter && (
+                <a
+                  href={social.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
+                  className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+              )}
+              {social.linkedin && (
+                <a
+                  href={social.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
+          {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">{t('quickLinks')}</h3>
-            <ul className="space-y-2">
+            <h4 className="text-lg font-bold">{t('quickLinks')}</h4>
+            <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                    {link.label}
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {navLabel(link, locale)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: Projects */}
+          {/* Projects */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">{t('ourProjects')}</h3>
-            <ul className="space-y-2">
-              {projects.map((project) => (
-                <li key={project.slug}>
-                  <Link href={`/projects/${project.slug}`}
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                    {isRtl ? project.nameAr : project.nameEn}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 4: Contact Info — LEFT in Arabic */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">{t('contactInfo')}</h3>
+            <h4 className="text-lg font-bold">{t('ourProjects')}</h4>
             <ul className="space-y-3">
-              {/*
-                flex items: icon (first) + text (second).
-                In RTL dir: icon appears on the RIGHT, text on the LEFT ✓
-                No flex-row-reverse needed.
-              */}
-              <li className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-muted-foreground text-sm">{contactInfo.phone}</span>
+              {footerProjects.map((project: {
+                slug: string;
+                title?: unknown;
+                nameAr?: string;
+                nameEn?: string;
+              }) => (
+                <li key={project.slug}>
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {project.title
+                      ? translate(project.title, locale)
+                      : isRtl
+                        ? project.nameAr
+                        : project.nameEn}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div className="space-y-4">
+            <h4 className="text-lg font-bold">{t('contactInfo')}</h4>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3 text-muted-foreground">
+                <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm">
+                  {addressField
+                    ? translate(addressField, locale)
+                    : isRtl
+                      ? contactInfo.addressAr
+                      : contactInfo.addressEn}
+                </span>
               </li>
-              <li className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-muted-foreground text-sm">{contactInfo.email}</span>
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <Phone className="w-5 h-5 text-primary shrink-0" />
+                <span dir="ltr" className="text-sm">
+                  {settings?.phone
+                    ? translate(settings.phone, locale)
+                    : contactInfo.phone}
+                </span>
               </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-muted-foreground text-sm">
-                  {isRtl ? contactInfo.addressAr : contactInfo.addressEn}
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <Mail className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm">
+                  {settings?.email
+                    ? translate(settings.email, locale)
+                    : contactInfo.email}
+                </span>
+              </li>
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <Clock className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm">
+                  {settings?.officeHours
+                    ? translate(settings.officeHours, locale)
+                    : isRtl
+                      ? '9:00 ص - 6:00 م'
+                      : '9:00 AM - 6:00 PM'}
                 </span>
               </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Copyright */}
-      <div className="border-t border-border">
-        <div className="container mx-auto px-4 py-6">
-          <p className="text-center text-muted-foreground text-sm">{t('copyright')}</p>
+        <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-muted-foreground text-xs">
+            {isRtl ? (
+              <>
+                جميع الحقوق محفوظة © تصميم{' '}
+                <a
+                  href="https://www.qeematech.net/"
+                  rel="dofollow"
+                  target="_blank"
+                  className="text-primary hover:underline"
+                >
+                  Qeematech
+                </a>
+              </>
+            ) : (
+              <>
+                All Rights Reserved © Designed by{' '}
+                <a
+                  href="https://www.qeematech.net/"
+                  rel="dofollow"
+                  target="_blank"
+                  className="text-primary hover:underline"
+                >
+                  Qeematech
+                </a>
+              </>
+            )}
+          </p>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/privacy"
+              className="text-muted-foreground hover:text-primary text-xs transition-colors"
+            >
+              {isRtl ? 'سياسة الخصوصية' : 'Privacy Policy'}
+            </Link>
+            <Link
+              href="/terms"
+              className="text-muted-foreground hover:text-primary text-xs transition-colors"
+            >
+              {isRtl ? 'الشروط والأحكام' : 'Terms & Conditions'}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

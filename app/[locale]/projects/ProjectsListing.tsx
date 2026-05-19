@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -13,29 +13,47 @@ import { PageHero } from '@/components/shared/PageHero';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
-import { projects } from '@/data/site';
+import { getProjects, getCategories } from '@/lib/public-api';
+import { projects as staticProjects } from '@/data/site';
 
-type CategoryFilter = 'all' | 'commercial' | 'administrative' | 'medical' | 'mixed-use';
+import { t as translate } from '@/lib/translate';
 
 export function ProjectsListing() {
-  const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [dynamicProjects, setDynamicProjects] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const t = useTranslations('sections');
   const tFilters = useTranslations('filters');
   const tCta = useTranslations('cta');
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
-  const filters: { value: CategoryFilter; label: string }[] = [
-    { value: 'all', label: tFilters('all') },
-    { value: 'commercial', label: tFilters('commercial') },
-    { value: 'administrative', label: tFilters('administrative') },
-    { value: 'medical', label: tFilters('medical') },
-    { value: 'mixed-use', label: tFilters('mixedUse') },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [projectsRes, categoriesRes] = await Promise.all([
+          getProjects(),
+          getCategories()
+        ]);
+        setDynamicProjects(projectsRes);
+        setCategories(categoriesRes);
+      } catch (err) {
+        console.error("Failed to fetch projects data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
+  const displayProjects = dynamicProjects.length > 0 ? dynamicProjects : staticProjects;
+  
   const filteredProjects = activeFilter === 'all'
-    ? projects
-    : projects.filter((p) => p.category === activeFilter);
+    ? displayProjects
+    : displayProjects.filter((p) => p.categoryId === activeFilter || p.category?.slug === activeFilter || p.category === activeFilter);
+
 
   return (
     <>
@@ -51,18 +69,24 @@ export function ProjectsListing() {
             <div className="flex justify-center mb-12">
               <Tabs
                 value={activeFilter}
-                onValueChange={(v) => setActiveFilter(v as CategoryFilter)}
+                onValueChange={(v) => setActiveFilter(v)}
                 className="w-auto"
                 dir={isRtl ? 'rtl' : 'ltr'}
               >
                 <TabsList className="bg-secondary/50 p-1 flex-wrap h-auto">
-                  {filters.map((filter) => (
+                  <TabsTrigger
+                    value="all"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-2"
+                  >
+                    {tFilters('all')}
+                  </TabsTrigger>
+                  {categories.map((cat) => (
                     <TabsTrigger
-                      key={filter.value}
-                      value={filter.value}
+                      key={cat.id}
+                      value={cat.id}
                       className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-2"
                     >
-                      {filter.label}
+                      {translate(cat.name, locale)}
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -82,8 +106,8 @@ export function ProjectsListing() {
                     {/* Image */}
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image
-                        src={project.image}
-                        alt={isRtl ? project.nameAr : project.nameEn}
+                        src={project.mainImage || project.image}
+                        alt={translate(project.title, locale)}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
@@ -101,23 +125,22 @@ export function ProjectsListing() {
                     {/* Content */}
                     <div className={cn('p-6', isRtl && 'text-right')}>
                       <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                        {isRtl ? project.nameAr : project.nameEn}
+                        {translate(project.title, locale)}
                       </h3>
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                        {isRtl ? project.shortDescAr : project.shortDescEn}
+                        {translate(project.shortDescription || project.shortDesc || project.description, locale)}
                       </p>
 
                       {/* Tags */}
                       <div className={cn('flex flex-wrap gap-2 mb-4', isRtl && 'justify-end')}>
-                        {(isRtl ? project.tagsAr : project.tagsEn).slice(0, 3).map((tag, i) => (
+                        {project.category && (
                           <Badge
-                            key={i}
                             variant="secondary"
-                            className="bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
+                            className="bg-primary/20 text-primary hover:bg-primary/30"
                           >
-                            {tag}
+                            {translate(project.category.name, locale)}
                           </Badge>
-                        ))}
+                        )}
                       </div>
 
                       {/* Button */}

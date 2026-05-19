@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
@@ -18,40 +18,113 @@ import {
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { PageHero } from '@/components/shared/PageHero';
 import { cn } from '@/lib/utils';
-import { projects, siteInfo } from '@/data/site';
+import { getSettings, getProjects, submitContactForm } from '@/lib/public-api';
+import { siteInfo, projects, socialLinks as staticSocial } from '@/data/site';
+import { SocialLinks, resolveSocialLinks } from '@/components/shared/SocialLinks';
+import { t as translate } from '@/lib/translate';
+import { getSettingText } from '@/lib/contact-links';
 
-export function ContactContent() {
+function toHrefString(href: unknown): string {
+  if (typeof href === 'string') return href;
+  if (href && typeof href === 'object' && 'text' in href) {
+    return String((href as { text: string }).text || '');
+  }
+  return '';
+}
+
+function isExternalUrl(href: unknown): boolean {
+  const s = toHrefString(href);
+  return s.startsWith('http://') || s.startsWith('https://');
+}
+
+function getContactHeroSection(pageData?: { sections?: Array<Record<string, unknown>> }) {
+  const sections = pageData?.sections ?? [];
+  return (
+    sections.find((s) => s.sectionKey === 'contact-hero') ||
+    sections.find((s) => s.backgroundImage || s.image)
+  );
+}
+
+export function ContactContent({
+  pageData,
+}: {
+  pageData?: { sections?: Array<Record<string, unknown>> } | null;
+}) {
   const t = useTranslations();
   const locale = useLocale();
   const isRtl = locale === 'ar';
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
+  const [dynamicProjects, setDynamicProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [settingsRes, projectsRes] = await Promise.all([
+          getSettings(),
+          getProjects()
+        ]);
+        setSettings(settingsRes);
+        setDynamicProjects(projectsRes);
+      } catch (err) {
+        console.error("Failed to fetch contact data", err);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    alert(isRtl ? 'تم إرسال رسالتك بنجاح!' : 'Your message has been sent successfully!');
+    
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      subject: `New Request: ${formData.get('requestType')} - ${formData.get('preferredMall')}`,
+      message: `Request Type: ${formData.get('requestType')}\nMall: ${formData.get('preferredMall')}\nUnit: ${formData.get('unitType')}\n\nMessage: ${formData.get('message')}`,
+    };
+
+    try {
+      await submitContactForm(data);
+      alert(isRtl ? 'تم إرسال رسالتك بنجاح!' : 'Your message has been sent successfully!');
+      (e.target as HTMLFormElement).reset();
+    } catch (err) {
+      alert(isRtl ? 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.' : 'Error sending message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const phoneText = getSettingText(settings?.phone, siteInfo.phone, locale);
+  const emailText = getSettingText(settings?.email, siteInfo.email, locale);
+  const mapsHref = getSettingText(
+    settings?.googleMaps,
+    siteInfo.googleMaps,
+    locale
+  );
 
   const contactItems = [
     {
       icon: Phone,
       label: isRtl ? 'الهاتف' : 'Phone',
-      value: siteInfo.phone,
-      href: `tel:${siteInfo.phone}`,
+      value: phoneText,
+      href: phoneText ? `tel:${phoneText}` : undefined,
     },
     {
       icon: Mail,
       label: isRtl ? 'البريد الإلكتروني' : 'Email',
-      value: siteInfo.email,
-      href: `mailto:${siteInfo.email}`,
+      value: emailText,
+      href: emailText ? `mailto:${emailText}` : undefined,
     },
     {
       icon: MapPin,
       label: isRtl ? 'العنوان' : 'Address',
-      value: isRtl ? siteInfo.addressAr : siteInfo.addressEn,
-      href: siteInfo.googleMaps,
+      value: isRtl
+        ? getSettingText(settings?.addressAr, siteInfo.addressAr, locale)
+        : getSettingText(settings?.addressEn, siteInfo.addressEn, locale),
+      href: mapsHref || undefined,
     },
     {
       icon: Clock,
@@ -60,16 +133,33 @@ export function ContactContent() {
     },
   ];
 
+  const displayProjects = dynamicProjects.length > 0 ? dynamicProjects : projects;
+
+  const social = resolveSocialLinks(settings?.socialLinks, staticSocial);
+
+  const heroSection = getContactHeroSection(pageData ?? undefined);
+  const heroImage =
+    (heroSection?.backgroundImage as string | undefined) ||
+    (heroSection?.image as string | undefined);
+
   return (
     <>
-      {/* Fixed: PageHero accepts title/subtitle — locale selected here */}
       <PageHero
-        title={isRtl ? 'اتصل بنا' : 'Contact Us'}
-        subtitle={
-          isRtl
-            ? 'تواصل معنا وسيتم مناقشة استفسارك من خلال فريقنا المختص'
-            : 'Get in touch with us and our specialized team will address your inquiries'
+        title={
+          heroSection?.title
+            ? (heroSection.title as string | Record<string, string>)
+            : isRtl
+              ? 'اتصل بنا'
+              : 'Contact Us'
         }
+        subtitle={
+          heroSection?.subtitle
+            ? (heroSection.subtitle as string | Record<string, string>)
+            : isRtl
+              ? 'تواصل معنا وسيتم مناقشة استفسارك من خلال فريقنا المختص'
+              : 'Get in touch with us and our specialized team will address your inquiries'
+        }
+        backgroundImage={heroImage}
       />
 
       <section className="py-20 bg-background">
@@ -93,21 +183,23 @@ export function ContactContent() {
                           whileInView={{ opacity: 1, x: 0 }}
                           viewport={{ once: true }}
                           transition={{ delay: index * 0.1 }}
-                          className={cn(
-                            'flex items-start gap-4',
-                            isRtl && 'text-right'
-                          )}
+                          className="flex items-start gap-4"
+                          dir={isRtl ? 'rtl' : 'ltr'}
                         >
-                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                             <Icon className="w-5 h-5 text-primary" />
                           </div>
-                          <div>
+                          <div className="flex-1 text-start">
                             <p className="text-sm text-muted-foreground mb-1">{item.label}</p>
                             {item.href ? (
                               <a
-                                href={item.href}
-                                target={item.href.startsWith('http') ? '_blank' : undefined}
-                                rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                href={toHrefString(item.href)}
+                                target={isExternalUrl(item.href) ? '_blank' : undefined}
+                                rel={
+                                  isExternalUrl(item.href)
+                                    ? 'noopener noreferrer'
+                                    : undefined
+                                }
                                 className="text-foreground hover:text-primary transition-colors"
                               >
                                 {item.value}
@@ -121,25 +213,11 @@ export function ContactContent() {
                     })}
                   </div>
 
-                  {/* Social Links */}
-                  <div className="mt-8 pt-8 border-t border-border">
-                    <p className={cn('text-sm text-muted-foreground mb-4', isRtl && 'text-right')}>
+                  <div className="mt-8 pt-8 border-t border-border" dir={isRtl ? 'rtl' : 'ltr'}>
+                    <p className="text-sm text-muted-foreground mb-4 text-start">
                       {isRtl ? 'تابعنا على' : 'Follow Us'}
                     </p>
-                    <div className={cn('flex gap-3', isRtl && 'justify-end')}>
-                      {Object.entries(siteInfo.social).map(([platform, url]) => (
-                        <a
-                          key={platform}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 rounded-full bg-foreground/5 hover:bg-primary/20 flex items-center justify-center text-foreground/60 hover:text-primary transition-colors"
-                        >
-                          <span className="sr-only">{platform}</span>
-                          <span className="text-sm capitalize">{platform[0].toUpperCase()}</span>
-                        </a>
-                      ))}
-                    </div>
+                    <SocialLinks links={social} alignEnd={isRtl} />
                   </div>
                 </div>
               </AnimatedReveal>
@@ -217,9 +295,13 @@ export function ContactContent() {
                             <SelectValue placeholder={isRtl ? 'اختر المول' : 'Select mall'} />
                           </SelectTrigger>
                           <SelectContent>
-                            {projects.map((project) => (
-                              <SelectItem key={project.id} value={project.slug}>
-                                {isRtl ? project.nameAr : project.nameEn}
+                            {displayProjects.map((project: any) => (
+                              <SelectItem key={project.id || project.slug} value={project.slug}>
+                                {project.title
+                                  ? translate(project.title, locale)
+                                  : isRtl
+                                    ? project.nameAr
+                                    : project.nameEn}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -262,7 +344,7 @@ export function ContactContent() {
                     >
                       {isSubmitting ? (
                         <span className={cn('flex items-center gap-2', isRtl && 'flex-row-reverse')}>
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span className="w-4 h-4 border-2 border-muted-foreground/30 border-t-primary rounded-full animate-spin" />
                           {isRtl ? 'جاري الإرسال...' : 'Sending...'}
                         </span>
                       ) : (

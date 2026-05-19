@@ -9,29 +9,42 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { heroSlides } from '@/data/site';
+import { t as translate } from '@/lib/translate';
 
-export function HeroSlider() {
+export function HeroSlider({ data }: { data?: any }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const t = useTranslations('hero');
   const tCta = useTranslations('cta');
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
+  const slides =
+    data?.customData && Array.isArray(data.customData) && data.customData.length > 0
+      ? data.customData.map((slide: any) => ({
+          ...slide,
+          image:
+            typeof slide.image === 'string'
+              ? slide.image
+              : slide.mainImage || '/images/hero/hero-1.jpg',
+        }))
+      : heroSlides;
+
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  }, []);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  }, []);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [slides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000);
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  const slide = heroSlides[currentSlide];
+  const slide = slides[currentSlide];
   const slideKey = `slide${currentSlide + 1}` as keyof typeof t.raw;
+
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
@@ -80,28 +93,28 @@ export function HeroSlider() {
               </motion.span>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 text-balance leading-tight">
-                {t(`${slideKey}.title` as any)}
+                {translate(slide.title, locale) || t(`${slideKey}.title` as any)}
               </h1>
 
               <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-2xl text-pretty">
-                {t(`${slideKey}.subtitle` as any)}
+                {translate(slide.text || slide.subtitle, locale) || t(`${slideKey}.subtitle` as any)}
               </p>
 
-              {currentSlide === 0 && (
-                <div className={cn('flex gap-4 justify-center')}>
-                  <Link href="/projects">
+              {(slide.link || slide.buttonUrl || currentSlide === 0) && (
+                <div className={cn('flex flex-col sm:flex-row gap-4 justify-center')}>
+                  <Link href={slide.link || slide.buttonUrl || "/projects"}>
                     <Button
-                      size="lg"
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg"
+                      size="sm"
+                      className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 md:px-8 md:py-6 text-xs md:text-lg rounded-full h-10 md:h-auto"
                     >
-                      {tCta('exploreProjects')}
+                      {translate(slide.buttonText, locale) || tCta('exploreProjects')}
                     </Button>
                   </Link>
                   <Link href="/contact">
                     <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg"
+                      size="sm"
+                      variant="ghost"
+                      className="w-full sm:w-auto border border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white px-4 py-2 md:px-8 md:py-6 text-xs md:text-lg rounded-full h-10 md:h-auto backdrop-blur-sm"
                     >
                       {tCta('contactUs')}
                     </Button>
@@ -135,7 +148,7 @@ export function HeroSlider() {
 
       {/* Slide Indicators */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
-        {heroSlides.map((_, index) => (
+        {slides.map((_: any, index: number) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,7 +11,9 @@ import { PageHero } from '@/components/shared/PageHero';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
-import { galleryImages, projects } from '@/data/site';
+import { galleryImages } from '@/data/site';
+import { getGallery, getGalleryCategories } from '@/lib/public-api';
+import { t as translate } from '@/lib/translate';
 
 export function PhotoGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -22,17 +24,57 @@ export function PhotoGallery() {
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
-  const filters = [
-    { value: 'all', label: tFilters('all') },
-    ...projects.map((p) => ({
-      value: p.slug,
-      label: isRtl ? p.nameAr : p.nameEn,
-    })),
-  ];
+  const [filters, setFilters] = useState([{ value: 'all', label: tFilters('all') }]);
+  const [images, setImages] = useState(galleryImages);
 
-  const filteredImages = activeFilter === 'all'
-    ? galleryImages
-    : galleryImages.filter((img) => img.project === activeFilter);
+  useEffect(() => {
+    getGalleryCategories()
+      .then((cats) => {
+        if (cats?.length) {
+          setFilters([
+            { value: 'all', label: tFilters('all') },
+            ...cats.map((cat: any) => ({
+              value: cat.slug,
+              label: translate(cat.name, locale),
+            })),
+          ]);
+        }
+      })
+      .catch(() => {});
+  }, [locale, tFilters]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getGallery({
+          type: 'image',
+          category: activeFilter !== 'all' ? activeFilter : undefined,
+        });
+        if (data?.length) {
+          setImages(
+            data.map((item: any) => ({
+              id: item.id,
+              src: item.fileUrl,
+              alt: item.altText || item.title || item.originalName || '',
+              project: item.galleryCategory?.slug || 'all',
+            }))
+          );
+        } else if (activeFilter === 'all') {
+          setImages(galleryImages);
+        } else {
+          setImages([]);
+        }
+      } catch (err) {
+        console.error('Failed to load gallery images', err);
+      }
+    };
+    load();
+  }, [activeFilter]);
+
+  const filteredImages =
+    activeFilter === 'all'
+      ? images
+      : images.filter((img) => img.project === activeFilter);
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);

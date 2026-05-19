@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -12,57 +12,131 @@ import { PageHero } from '@/components/shared/PageHero';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
-import { news } from '@/data/site';
+import { news as staticNews } from '@/data/site';
+import { getNews, getNewsCategories } from '@/lib/public-api';
+import { t as translate } from '@/lib/translate';
+import {
+  buildNewsFilterTabs,
+  getNewsCategoryLabel,
+  NEWS_CATEGORY_OPTIONS,
+} from '@/lib/news-categories';
+import { Badge } from '@/components/ui/badge';
+
+type NewsListItem = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  date: string;
+  category?: string;
+};
+
+function normalizeNewsItem(item: any, locale: string): NewsListItem {
+  if (item.titleAr || item.titleEn) {
+    return {
+      id: item.id,
+      slug: item.slug,
+      title: locale === 'ar' ? item.titleAr : item.titleEn,
+      excerpt: locale === 'ar' ? item.excerptAr : item.excerptEn,
+      image: item.image,
+      date: item.date,
+      category: item.category,
+    };
+  }
+  const published = item.publishedAt
+    ? new Date(item.publishedAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')
+    : '';
+  return {
+    id: item.id,
+    slug: item.slug,
+    title: translate(item.title, locale),
+    excerpt: translate(item.excerpt || item.shortDescription, locale),
+    image: item.mainImage || '/images/news/news-1.jpg',
+    date: published,
+    category: item.category,
+  };
+}
 
 export function NewsListing() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [newsItems, setNewsItems] = useState<NewsListItem[]>([]);
+  const [categoryRecords, setCategoryRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const t = useTranslations('sections');
-  const tCategories = useTranslations('newsCategories');
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
-  const categories = [
-    { value: 'all', label: isRtl ? 'الكل' : 'All' },
-    { value: 'real-estate', label: tCategories('realEstate') },
-    { value: 'investment', label: tCategories('investment') },
-    { value: 'projects', label: tCategories('projects') },
-    { value: 'exhibitions', label: tCategories('exhibitions') },
-  ];
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const data = await getNews();
+        if (data?.length) {
+          setNewsItems(data.map((item: any) => normalizeNewsItem(item, locale)));
+        } else {
+          setNewsItems(staticNews.map((item) => normalizeNewsItem(item, locale)));
+        }
+      } catch {
+        setNewsItems(staticNews.map((item) => normalizeNewsItem(item, locale)));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, [locale]);
 
-  const filteredNews = news.filter((item) => {
-    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
-    const title = isRtl ? item.titleAr : item.titleEn;
-    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase());
+  useEffect(() => {
+    getNewsCategories()
+      .then((data) => setCategoryRecords(data || []))
+      .catch(() => setCategoryRecords([]));
+  }, []);
+
+  const categories =
+    categoryRecords.length > 0
+      ? buildNewsFilterTabs(
+          categoryRecords,
+          locale,
+          isRtl ? 'الكل' : 'All'
+        )
+      : [
+          { value: 'all', label: isRtl ? 'الكل' : 'All' },
+          ...NEWS_CATEGORY_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: isRtl ? opt.labelAr : opt.labelEn,
+          })),
+        ];
+
+  const filteredNews = newsItems.filter((item) => {
+    const matchesCategory =
+      activeCategory === 'all' || item.category === activeCategory;
+    const matchesSearch = item.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   return (
     <>
-      <PageHero
-        title={t('latestNews')}
-        backgroundImage="/images/hero/hero-4.jpg"
-      />
+      <PageHero title={t('latestNews')} backgroundImage="/images/hero/hero-4.jpg" />
 
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
-          {/* Search and Filters */}
           <AnimatedReveal>
             <div className="flex flex-col md:flex-row gap-6 items-center justify-between mb-12">
-              {/* Category Filters (First in RTL = Right) */}
               <Tabs
                 value={activeCategory}
                 onValueChange={setActiveCategory}
                 className="w-auto"
                 dir={isRtl ? 'rtl' : 'ltr'}
               >
-                <TabsList className="bg-secondary/50 p-1 flex-wrap h-auto">
+                <TabsList className="bg-muted border border-border rounded-full p-1.5 flex-wrap h-auto gap-0.5 shadow-sm">
                   {categories.map((cat) => (
                     <TabsTrigger
                       key={cat.value}
                       value={cat.value}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 text-sm"
+                      className="rounded-full px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=active]:shadow-none"
                     >
                       {cat.label}
                     </TabsTrigger>
@@ -70,12 +144,13 @@ export function NewsListing() {
                 </TabsList>
               </Tabs>
 
-              {/* Search (Second in RTL = Left) */}
               <div className="relative w-full md:w-80">
-                <Search className={cn(
-                  'absolute top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground',
-                  isRtl ? 'right-3' : 'left-3'
-                )} />
+                <Search
+                  className={cn(
+                    'absolute top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground',
+                    isRtl ? 'right-3' : 'left-3'
+                  )}
+                />
                 <Input
                   type="text"
                   placeholder={tCommon('search')}
@@ -90,8 +165,9 @@ export function NewsListing() {
             </div>
           </AnimatedReveal>
 
-          {/* News Grid */}
-          {filteredNews.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          ) : filteredNews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredNews.map((item, index) => (
                 <AnimatedReveal key={item.id} delay={index * 0.05}>
@@ -103,27 +179,29 @@ export function NewsListing() {
                         isRtl && 'text-right'
                       )}
                     >
-                      {/* Image */}
                       <div className="relative aspect-[16/10] overflow-hidden">
                         <Image
                           src={item.image}
-                          alt={isRtl ? item.titleAr : item.titleEn}
+                          alt={item.title}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       </div>
-
-                      {/* Content */}
                       <div className="p-6">
-                        <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
+                        <div className="flex items-center gap-2 flex-wrap text-muted-foreground text-sm mb-3">
+                          {item.category && (
+                            <Badge variant="secondary" className="text-xs">
+                              {getNewsCategoryLabel(item.category, locale, categoryRecords)}
+                            </Badge>
+                          )}
                           <Calendar className="w-4 h-4" />
                           <span>{item.date}</span>
                         </div>
                         <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                          {isRtl ? item.titleAr : item.titleEn}
+                          {item.title}
                         </h3>
                         <p className="text-muted-foreground text-sm line-clamp-2">
-                          {isRtl ? item.excerptAr : item.excerptEn}
+                          {item.excerpt}
                         </p>
                       </div>
                     </motion.article>

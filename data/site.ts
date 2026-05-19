@@ -58,9 +58,16 @@ export interface Job {
 
 export interface TeamMember {
   id: string;
+  nameAr?: string;
+  nameEn?: string;
   titleAr: string;
   titleEn: string;
+  bioAr?: string;
+  bioEn?: string;
   image: string;
+  phone?: string;
+  email?: string;
+  linkedin?: string;
 }
 
 export interface StatItem {
@@ -357,11 +364,50 @@ export const jobs: Job[] = [
 ];
 
 export const teamMembers: TeamMember[] = [
-  { id: '1', titleAr: 'رئيس مجلس الإدارة', titleEn: 'Chairman', image: '/images/team/team-1.jpg' },
-  { id: '2', titleAr: 'المدير التنفيذي', titleEn: 'Chief Executive Officer', image: '/images/team/team-2.jpg' },
-  { id: '3', titleAr: 'مدير المبيعات', titleEn: 'Sales Manager', image: '/images/team/team-3.jpg' },
-  { id: '4', titleAr: 'مدير التسويق', titleEn: 'Marketing Manager', image: '/images/team/team-4.jpg' },
-  { id: '5', titleAr: 'مدير تطوير الأعمال', titleEn: 'Business Development Manager', image: '/images/team/team-5.jpg' },
+  {
+    id: '1',
+    nameAr: 'أحمد محمود',
+    nameEn: 'Ahmed Mahmoud',
+    titleAr: 'رئيس مجلس الإدارة',
+    titleEn: 'Chairman',
+    bioAr: 'قيادة استراتيجية لنمو محفظة سفنكس العقارية.',
+    bioEn: 'Strategic leadership for SPHINX real estate portfolio growth.',
+    image: '/images/team/team-1.jpg',
+  },
+  {
+    id: '2',
+    nameAr: 'محمد حسن',
+    nameEn: 'Mohamed Hassan',
+    titleAr: 'المدير التنفيذي',
+    titleEn: 'Chief Executive Officer',
+    image: '/images/team/team-2.jpg',
+  },
+  {
+    id: '3',
+    nameAr: 'سارة علي',
+    nameEn: 'Sara Ali',
+    titleAr: 'مدير المبيعات',
+    titleEn: 'Sales Manager',
+    image: '/images/team/team-3.jpg',
+    email: 'sales@example.com',
+  },
+  {
+    id: '4',
+    nameAr: 'نور الدين',
+    nameEn: 'Nour El Din',
+    titleAr: 'مدير التسويق',
+    titleEn: 'Marketing Manager',
+    image: '/images/team/team-4.jpg',
+  },
+  {
+    id: '5',
+    nameAr: 'كريم يوسف',
+    nameEn: 'Karim Youssef',
+    titleAr: 'مدير تطوير الأعمال',
+    titleEn: 'Business Development Manager',
+    image: '/images/team/team-5.jpg',
+    linkedin: 'linkedin.com/in/example',
+  },
 ];
 
 export const stats: StatItem[] = [

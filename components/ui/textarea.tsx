@@ -2,7 +2,10 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
+function Textarea({ className, value, ...props }: React.ComponentProps<'textarea'>) {
+  const isValueProvided = value !== undefined
+  const coercedValue = value === null ? '' : value
+
   return (
     <textarea
       data-slot="textarea"
@@ -11,6 +14,7 @@ function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
         className,
       )}
       {...props}
+      {...(isValueProvided ? { value: coercedValue } : {})}
     />
   )
 }

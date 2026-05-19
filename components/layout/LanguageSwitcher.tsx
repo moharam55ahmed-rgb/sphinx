@@ -15,7 +15,7 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-1 bg-white/5 rounded-full p-1">
+    <div className="flex items-center gap-1 bg-muted rounded-full p-1 border border-border">
       <Button
         variant="ghost"
         size="sm"
@@ -24,7 +24,7 @@ export function LanguageSwitcher() {
           'rounded-full px-3 py-1 text-xs font-medium transition-all',
           locale === 'ar'
             ? 'bg-primary text-primary-foreground'
-            : 'text-white/70 hover:text-white hover:bg-white/10'
+            : 'text-muted-foreground hover:text-foreground hover:bg-background'
         )}
       >
         AR
@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
           'rounded-full px-3 py-1 text-xs font-medium transition-all',
           locale === 'en'
             ? 'bg-primary text-primary-foreground'
-            : 'text-white/70 hover:text-white hover:bg-white/10'
+            : 'text-muted-foreground hover:text-foreground hover:bg-background'
         )}
       >
         EN

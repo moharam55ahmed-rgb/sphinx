@@ -7,35 +7,52 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { StatsSection } from '@/components/shared/StatsSection';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
+import { t as translate } from '@/lib/translate';
 
-export function AboutContent() {
+export function AboutContent({ data }: { data?: any }) {
   const t = useTranslations('sections');
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
-  const cards = [
-    {
-      icon: Eye,
-      title: t('vision'),
-      description: t('visionDesc'),
-    },
-    {
-      icon: Target,
-      title: t('mission'),
-      description: t('missionDesc'),
-    },
-    {
-      icon: Heart,
-      title: t('values'),
-      description: (t.raw('valuesItems') as string[]).join(' • '),
-    },
-  ];
+  const sections = data?.sections || [];
+  const getSection = (key: string) => sections.find((s: any) => s.sectionKey === key);
+
+  const vmvData = getSection('about-vmv');
+  const defaultIcons = [Eye, Target, Heart];
+  const cards = vmvData?.customData && Array.isArray(vmvData.customData) && vmvData.customData.length > 0
+    ? vmvData.customData.map((item: any, i: number) => ({
+        icon: defaultIcons[i] || Target,
+        title: item.title,
+        description: item.text || item.description,
+      }))
+    : [
+        {
+          icon: Eye,
+          title: t('vision'),
+          description: t('visionDesc'),
+        },
+        {
+          icon: Target,
+          title: t('mission'),
+          description: t('missionDesc'),
+        },
+        {
+          icon: Heart,
+          title: t('values'),
+          description: ((t.raw('valuesItems') as unknown[]) || [])
+            .map((item) => translate(item, locale))
+            .join(' • '),
+        },
+      ];
+
+  const mainContent = getSection('about-main');
+
 
   return (
     <>
       <PageHero
-        title={t('aboutUs')}
-        backgroundImage="/images/hero/hero-1.jpg"
+        title={data?.title || t('aboutUs')}
+        backgroundImage={data?.image || "/images/hero/hero-1.jpg"}
       />
 
       {/* Main About Content */}
@@ -44,20 +61,26 @@ export function AboutContent() {
           <div className={cn('max-w-4xl mx-auto', isRtl && 'text-right')}>
             <AnimatedReveal>
               <span className="inline-block text-primary text-sm font-medium tracking-wider uppercase mb-4">
-                {t('aboutUs')}
+                {mainContent?.subtitle
+                  ? translate(mainContent.subtitle, locale)
+                  : t('aboutUs')}
               </span>
             </AnimatedReveal>
 
             <AnimatedReveal delay={0.1}>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 text-balance">
-                {t('aboutTitle')}
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 text-balance">
+                {mainContent?.title
+                  ? translate(mainContent.title, locale)
+                  : t('aboutTitle')}
               </h2>
             </AnimatedReveal>
 
             <AnimatedReveal delay={0.2}>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                {t('aboutLong')}
-              </p>
+              <div className="text-lg text-muted-foreground leading-relaxed mb-8 whitespace-pre-wrap">
+                {mainContent?.description
+                  ? translate(mainContent.description, locale)
+                  : t('aboutLong')}
+              </div>
             </AnimatedReveal>
           </div>
         </div>
@@ -81,8 +104,12 @@ export function AboutContent() {
                   )}>
                     <card.icon className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{card.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{card.description}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-4">
+                    {translate(card.title, locale)}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {translate(card.description, locale)}
+                  </p>
                 </div>
               </AnimatedReveal>
             ))}
@@ -90,8 +117,8 @@ export function AboutContent() {
         </div>
       </section>
 
-      <StatsSection />
-      <CTASection />
+      <StatsSection data={getSection('about-stats')} />
+      <CTASection data={getSection('about-cta')} />
     </>
   );
 }

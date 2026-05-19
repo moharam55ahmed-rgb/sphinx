@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="7" fill="#0B0D10"/>
+  <g fill="#D6B46A">
+    <!-- Crown towers -->
+    <rect x="9" y="5" width="3.2" height="8.5" rx="0.8"/>
+    <rect x="14.4" y="3" width="3.2" height="10.5" rx="0.8"/>
+    <rect x="19.8" y="5" width="3.2" height="8.5" rx="0.8"/>
+    <!-- Wings + body (single bold shape) -->
+    <path
+      d="M5.5 15.5 9 11.5 12.5 12.5 16 11.8 19.5 12.5 23 11.5 26.5 15.5 26.5 21.5 5.5 21.5Z"
+    />
+    <!-- Head -->
+    <ellipse cx="21.2" cy="13.8" rx="4.2" ry="3.6"/>
+    <!-- Headdress bar -->
+    <rect x="17.2" y="9.2" width="8" height="1.6" rx="0.4"/>
+    <!-- Front paws -->
+    <rect x="7.5" y="21" width="5.5" height="2.8" rx="0.6"/>
+    <rect x="19" y="21" width="5.5" height="2.8" rx="0.6"/>
+  </g>
+</svg>

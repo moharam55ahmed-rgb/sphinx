@@ -5,10 +5,23 @@ import { useLocale } from 'next-intl';
 import { useInView } from 'framer-motion';
 import { stats } from '@/data/site';
 import { cn } from '@/lib/utils';
+import { t as translate } from '@/lib/translate';
 
-export function StatsSection() {
+export function StatsSection({ data }: { data?: any }) {
   const locale = useLocale();
   const isRtl = locale === 'ar';
+
+  const displayStats =
+    data?.customData && Array.isArray(data.customData) && data.customData.length > 0
+      ? data.customData.map((item: any) => ({
+          value: translate(item.title, locale),
+          label: translate(item.text || item.description, locale),
+        }))
+      : stats.map((stat) => ({
+          value: isRtl ? stat.valueAr : stat.valueEn,
+          label: isRtl ? stat.labelAr : stat.labelEn,
+        }));
+
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
@@ -22,11 +35,11 @@ export function StatsSection() {
             isRtl && 'text-right'
           )}
         >
-          {stats.map((stat, index) => (
+          {displayStats.map((stat: any, index: number) => (
             <StatCard
               key={index}
-              value={isRtl ? stat.valueAr : stat.valueEn}
-              label={isRtl ? stat.labelAr : stat.labelEn}
+              value={stat.value}
+              label={stat.label}
               isInView={isInView}
               delay={index * 0.1}
             />

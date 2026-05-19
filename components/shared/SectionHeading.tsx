@@ -11,6 +11,8 @@ interface SectionHeadingProps {
   className?: string;
 }
 
+import { t as translate } from '@/lib/translate';
+
 export function SectionHeading({
   label,
   title,
@@ -32,15 +34,15 @@ export function SectionHeading({
     >
       {label && (
         <span className="inline-block text-primary text-sm font-medium tracking-wider uppercase">
-          {label}
+          {translate(label, locale)}
         </span>
       )}
       <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground text-balance">
-        {title}
+        {translate(title, locale)}
       </h2>
       {description && (
         <p className="text-muted-foreground text-lg max-w-3xl mx-auto text-pretty">
-          {description}
+          {translate(description, locale)}
         </p>
       )}
     </div>
