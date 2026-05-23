@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { TeamMembersEditor } from '@/components/admin/TeamMembersEditor';
+import { PageBannerEditor } from '@/components/admin/PageBannerEditor';
 import { normalizeTeamMembers, type TeamMemberRecord } from '@/lib/team';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -74,21 +75,26 @@ export default function AdminTeamPage() {
 
   if (!section) {
     return (
-      <div className="space-y-4 p-8 border border-dashed rounded-lg text-muted-foreground">
-        <p>
-          {isRtl
-            ? 'لم يُعثر على قسم team-members. أنشئه من صفحة الصفحات.'
-            : 'Team section not found. Create it from Pages → Team.'}
-        </p>
-        <Button asChild variant="outline">
-          <Link href={adminPath('/admin/pages')}>{t('pages')}</Link>
-        </Button>
+      <div className="space-y-6 max-w-4xl">
+        <PageBannerEditor pageSlug="team" sectionKey="team-hero" />
+        <div className="space-y-4 p-8 border border-dashed rounded-lg text-muted-foreground">
+          <p>
+            {isRtl
+              ? 'لم يُعثر على قسم أعضاء الفريق. أنشئه من صفحة الصفحات.'
+              : 'Team members section not found. Create it from Pages → Team.'}
+          </p>
+          <Button asChild variant="outline">
+            <Link href={adminPath('/admin/pages')}>{t('pages')}</Link>
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6 max-w-4xl">
+      <PageBannerEditor pageSlug="team" sectionKey="team-hero" />
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">

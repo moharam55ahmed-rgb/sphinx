@@ -150,6 +150,7 @@
     "pages": "Pages",
     "pageBanners": "Page Banners",
     "pageBannersDesc": "Change the top hero banner image for each page. Pick an image, then save.",
+    "pageBannerHint": "The large background image at the top of the page. Pick an image, then save.",
     "saveBanner": "Save banner",
     "changeBanner": "Change image",
     "selectBanner": "Select image",

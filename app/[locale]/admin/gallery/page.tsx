@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl';
 import { Image as ImageIcon, FolderOpen, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAdminPath } from '@/lib/admin-path';
+import { PageBannerEditor } from '@/components/admin/PageBannerEditor';
 import { cn } from '@/lib/utils';
 
 export default function AdminGalleryHubPage() {
@@ -74,6 +75,16 @@ export default function AdminGalleryHubPage() {
             </>
           )}
         </p>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">
+          {isRtl ? 'بانرات صفحات الجاليري' : 'Gallery page banners'}
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <PageBannerEditor pageSlug="gallery" sectionKey="gallery-photos-hero" />
+          <PageBannerEditor pageSlug="gallery" sectionKey="gallery-videos-hero" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
