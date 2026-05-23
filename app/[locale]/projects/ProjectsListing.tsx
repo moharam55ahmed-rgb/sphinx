@@ -13,7 +13,8 @@ import { PageHero } from '@/components/shared/PageHero';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
-import { getProjects, getCategories } from '@/lib/public-api';
+import { getProjects, getCategories, getPageBySlug } from '@/lib/public-api';
+import { getBannerImage } from '@/lib/page-banners';
 import { projects as staticProjects } from '@/data/site';
 
 import { t as translate } from '@/lib/translate';
@@ -24,6 +25,7 @@ export function ProjectsListing() {
   const [dynamicProjects, setDynamicProjects] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroImage, setHeroImage] = useState('/images/hero/hero-1.jpg');
 
   const t = useTranslations('sections');
   const tFilters = useTranslations('filters');
@@ -34,12 +36,15 @@ export function ProjectsListing() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [projectsRes, categoriesRes] = await Promise.all([
+        const [projectsRes, categoriesRes, page] = await Promise.all([
           getProjects(),
-          getCategories()
+          getCategories(),
+          getPageBySlug('projects'),
         ]);
         setDynamicProjects(projectsRes);
         setCategories(categoriesRes);
+        const hero = getBannerImage(page?.sections, 'projects-hero');
+        if (hero) setHeroImage(hero);
       } catch (err) {
         console.error("Failed to fetch projects data", err);
       } finally {
@@ -60,7 +65,7 @@ export function ProjectsListing() {
     <>
       <PageHero 
         title={t('projects')}
-        backgroundImage="/images/hero/hero-1.jpg"
+        backgroundImage={heroImage}
       />
 
       <section className="py-16 bg-background">

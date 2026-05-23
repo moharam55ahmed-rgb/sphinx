@@ -15,7 +15,7 @@ import { videos } from '@/data/site';
 import { getGallery, getGalleryCategories, getPageBySlug } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
 import { resolveMediaUrl } from '@/lib/media-url';
-import { findSection, getSectionHeroImage } from '@/lib/section-media';
+import { getBannerImage } from '@/lib/page-banners';
 
 export function VideosGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -33,9 +33,7 @@ export function VideosGallery() {
   useEffect(() => {
     getPageBySlug('gallery')
       .then((page) => {
-        const hero = getSectionHeroImage(
-          findSection(page?.sections, 'gallery-videos-hero')
-        );
+        const hero = getBannerImage(page?.sections, 'gallery-videos-hero');
         if (hero) setHeroImage(hero);
       })
       .catch(() => {});

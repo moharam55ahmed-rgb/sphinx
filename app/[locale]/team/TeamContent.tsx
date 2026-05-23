@@ -13,13 +13,14 @@ import { cn } from '@/lib/utils';
 import { teamMembers as staticTeam } from '@/data/site';
 import { getPageBySlug } from '@/lib/public-api';
 import { resolveMediaUrl } from '@/lib/media-url';
+import { getBannerImage } from '@/lib/page-banners';
 import {
   normalizeTeamMembers,
   getMemberName,
   getMemberJobTitle,
   type TeamMemberRecord,
 } from '@/lib/team';
-import { findSection, findPageHeroSection, getSectionHeroImage } from '@/lib/section-media';
+import { findSection, getSectionHeroImage } from '@/lib/section-media';
 function staticToRecords(isRtl: boolean): TeamMemberRecord[] {
   return staticTeam.map((m) => ({
     id: m.id,
@@ -56,8 +57,8 @@ export function TeamContent() {
       try {
         const page = await getPageBySlug('team');
         const hero =
-          getSectionHeroImage(findSection(page?.sections, 'team-hero')) ||
-          getSectionHeroImage(findPageHeroSection(page?.sections));
+          getBannerImage(page?.sections, 'team-hero') ||
+          getSectionHeroImage(findSection(page?.sections, 'about-main'));
         if (hero) setHeroImage(hero);
 
         const section = page?.sections?.find(

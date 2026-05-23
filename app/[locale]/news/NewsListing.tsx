@@ -13,7 +13,8 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { news as staticNews } from '@/data/site';
-import { getNews, getNewsCategories } from '@/lib/public-api';
+import { getNews, getNewsCategories, getPageBySlug } from '@/lib/public-api';
+import { getBannerImage } from '@/lib/page-banners';
 import { t as translate } from '@/lib/translate';
 import { resolveMediaUrl } from '@/lib/media-url';
 import {
@@ -65,6 +66,7 @@ export function NewsListing() {
   const [newsItems, setNewsItems] = useState<NewsListItem[]>([]);
   const [categoryRecords, setCategoryRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroImage, setHeroImage] = useState('/images/hero/hero-4.jpg');
   const t = useTranslations('sections');
   const tCommon = useTranslations('common');
   const locale = useLocale();
@@ -73,7 +75,12 @@ export function NewsListing() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const data = await getNews();
+        const [data, page] = await Promise.all([
+          getNews(),
+          getPageBySlug('news'),
+        ]);
+        const hero = getBannerImage(page?.sections, 'news-hero');
+        if (hero) setHeroImage(hero);
         if (data?.length) {
           setNewsItems(data.map((item: any) => normalizeNewsItem(item, locale)));
         } else {
@@ -120,7 +127,7 @@ export function NewsListing() {
 
   return (
     <>
-      <PageHero title={t('latestNews')} backgroundImage="/images/hero/hero-4.jpg" />
+      <PageHero title={t('latestNews')} backgroundImage={heroImage} />
 
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">

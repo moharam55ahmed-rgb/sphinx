@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { jobs as staticJobs } from '@/data/site';
 import { getPageBySlug } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
-import { findPageHeroSection, getSectionHeroImage } from '@/lib/section-media';
+import { getBannerImage } from '@/lib/page-banners';
 
 type JobItem = {
   id: string;
@@ -64,7 +64,7 @@ export function CareersContent() {
     const load = async () => {
       try {
         const page = await getPageBySlug('careers');
-        const hero = getSectionHeroImage(findPageHeroSection(page?.sections));
+        const hero = getBannerImage(page?.sections, 'careers-hero');
         if (hero) setHeroImage(hero);
 
         const section = page?.sections?.find(
