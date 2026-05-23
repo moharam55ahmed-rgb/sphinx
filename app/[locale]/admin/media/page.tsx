@@ -62,6 +62,7 @@ export default function MediaLibrary() {
     try {
       setLoading(true);
       const res = await apiClient.get('/media');
+      console.log(res)
       setMedia(res.data.data);
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || '';
