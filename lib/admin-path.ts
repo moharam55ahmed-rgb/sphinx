@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import { useParams } from 'next/navigation';
 
 export function useAdminLocale(): string {
@@ -10,8 +11,8 @@ export function useAdminLocale(): string {
 /** Prefix admin paths with current locale, e.g. `/admin/pages` → `/ar/admin/pages` */
 export function useAdminPath() {
   const locale = useAdminLocale();
-  return (path: string) => {
+  return useCallback((path: string) => {
     const normalized = path.startsWith('/') ? path : `/${path}`;
     return `/${locale}${normalized}`;
-  };
+  }, [locale]);
 }
