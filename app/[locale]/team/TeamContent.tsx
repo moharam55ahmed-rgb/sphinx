@@ -19,6 +19,7 @@ import {
   type TeamMemberRecord,
 } from '@/lib/team';
 
+const BACK_URL = process.env.BACK_URL;
 function staticToRecords(isRtl: boolean): TeamMemberRecord[] {
   return staticTeam.map((m) => ({
     id: m.id,
@@ -103,7 +104,7 @@ export function TeamContent() {
                     <div className="relative aspect-square overflow-hidden bg-secondary/50">
                       {member.image ? (
                         <Image
-                          src={member.image}
+                          src={`${BACK_URL}${member.image}`}
                           alt={name}
                           fill
                           className="object-cover"
