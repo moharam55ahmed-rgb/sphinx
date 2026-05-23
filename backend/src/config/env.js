@@ -9,4 +9,5 @@ module.exports = {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  backendUrl: `https://sphinx.nodeteam.site`,
 };
