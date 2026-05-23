@@ -12,9 +12,10 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { galleryImages } from '@/data/site';
-import { getGallery, getGalleryCategories } from '@/lib/public-api';
+import { getGallery, getGalleryCategories, getPageBySlug } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
 import { resolveMediaUrl } from '@/lib/media-url';
+import { findSection, getSectionHeroImage } from '@/lib/section-media';
 
 export function PhotoGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -27,6 +28,18 @@ export function PhotoGallery() {
 
   const [filters, setFilters] = useState([{ value: 'all', label: tFilters('all') }]);
   const [images, setImages] = useState(galleryImages);
+  const [heroImage, setHeroImage] = useState('/images/hero/hero-2.jpg');
+
+  useEffect(() => {
+    getPageBySlug('gallery')
+      .then((page) => {
+        const hero = getSectionHeroImage(
+          findSection(page?.sections, 'gallery-photos-hero')
+        );
+        if (hero) setHeroImage(hero);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     getGalleryCategories()
@@ -94,7 +107,7 @@ export function PhotoGallery() {
     <>
       <PageHero
         title={t('photoGallery')}
-        backgroundImage="/images/hero/hero-2.jpg"
+        backgroundImage={heroImage}
       />
 
       <section className="py-16 bg-background">

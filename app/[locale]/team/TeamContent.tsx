@@ -19,7 +19,7 @@ import {
   getMemberJobTitle,
   type TeamMemberRecord,
 } from '@/lib/team';
-import { findPageHeroSection, getSectionHeroImage } from '@/lib/section-media';
+import { findSection, findPageHeroSection, getSectionHeroImage } from '@/lib/section-media';
 function staticToRecords(isRtl: boolean): TeamMemberRecord[] {
   return staticTeam.map((m) => ({
     id: m.id,
@@ -55,7 +55,9 @@ export function TeamContent() {
     const load = async () => {
       try {
         const page = await getPageBySlug('team');
-        const hero = getSectionHeroImage(findPageHeroSection(page?.sections));
+        const hero =
+          getSectionHeroImage(findSection(page?.sections, 'team-hero')) ||
+          getSectionHeroImage(findPageHeroSection(page?.sections));
         if (hero) setHeroImage(hero);
 
         const section = page?.sections?.find(

@@ -12,9 +12,10 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { videos } from '@/data/site';
-import { getGallery, getGalleryCategories } from '@/lib/public-api';
+import { getGallery, getGalleryCategories, getPageBySlug } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
 import { resolveMediaUrl } from '@/lib/media-url';
+import { findSection, getSectionHeroImage } from '@/lib/section-media';
 
 export function VideosGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -27,6 +28,18 @@ export function VideosGallery() {
   const [filters, setFilters] = useState([{ value: 'all', label: tFilters('all') }]);
   const [videoItems, setVideoItems] = useState(videos);
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+  const [heroImage, setHeroImage] = useState('/images/hero/hero-3.jpg');
+
+  useEffect(() => {
+    getPageBySlug('gallery')
+      .then((page) => {
+        const hero = getSectionHeroImage(
+          findSection(page?.sections, 'gallery-videos-hero')
+        );
+        if (hero) setHeroImage(hero);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     getGalleryCategories()
@@ -96,7 +109,7 @@ export function VideosGallery() {
     <>
       <PageHero
         title={t('videosGallery')}
-        backgroundImage="/images/hero/hero-3.jpg"
+        backgroundImage={heroImage}
       />
 
       <section className="py-16 bg-background">
