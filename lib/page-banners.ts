@@ -94,6 +94,11 @@ export function getBannerImage(
   return getSectionHeroImage(findSection(sections, sectionKey));
 }
 
+/** Banner configs tied to a CMS page slug (e.g. team → team-hero). */
+export function getBannersForPage(pageSlug: string): PageBannerConfig[] {
+  return PAGE_BANNERS.filter((b) => b.pageSlug === pageSlug);
+}
+
 export function buildNewBannerSection(
   config: PageBannerConfig,
   pageId: string,

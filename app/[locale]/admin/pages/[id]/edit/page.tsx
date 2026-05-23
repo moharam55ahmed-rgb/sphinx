@@ -5,11 +5,13 @@ import { apiClient } from '@/lib/api-client';
 import { PageForm } from '../../create/page';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, Plus, Layers, Building2, ExternalLink } from 'lucide-react';
+import { Edit, Plus, Layers, Building2, ExternalLink, ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { formatBilingual } from '@/lib/translate';
 import { LegalPageEditor } from '@/components/admin/LegalPageEditor';
+import { PageBannerEditor } from '@/components/admin/PageBannerEditor';
 import { isLegalPageSlug } from '@/lib/legal-cms';
+import { getBannersForPage } from '@/lib/page-banners';
 import { useAdminPath } from '@/lib/admin-path';
 import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -57,6 +59,8 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
   const hasRelatedCompaniesSection = sections.some(
     (s: { sectionKey: string }) => s.sectionKey === 'related-companies'
   );
+  const pageBanners = getBannersForPage(initialData.slug);
+  const isTeamPage = initialData.slug === 'team';
 
   if (isLegal) {
     return (
@@ -99,6 +103,58 @@ export default function EditPage({ params }: { params: Promise<{ id: string }> }
             : 'Configure page settings and manage content sections.'}
         </p>
       </div>
+
+      {pageBanners.length > 0 && (
+        <Card className="border-primary/50 bg-primary/5 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle
+              className={cn(
+                'text-xl flex items-center gap-2 text-primary',
+                isRtl && 'flex-row-reverse justify-end'
+              )}
+            >
+              <ImageIcon className="w-5 h-5 shrink-0" />
+              {isRtl ? 'بانر الصفحة — الصورة العلوية' : 'Page banner — hero image'}
+            </CardTitle>
+            <p className={cn('text-sm text-muted-foreground', isRtl && 'text-right')}>
+              {isRtl
+                ? 'هنا تغيّر صورة الخلفية الكبيرة فوق عنوان الصفحة في الموقع. مش من «أقسام الصفحة».'
+                : 'Change the large background behind the page title on the public site — not from Page Sections.'}
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div
+              className={cn(
+                'grid gap-4',
+                pageBanners.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
+              )}
+            >
+              {pageBanners.map((banner) => (
+                <PageBannerEditor
+                  key={banner.id}
+                  pageSlug={banner.pageSlug}
+                  sectionKey={banner.sectionKey}
+                  className="border-primary/20"
+                />
+              ))}
+            </div>
+            {isTeamPage && (
+              <p className={cn('text-xs text-muted-foreground', isRtl && 'text-right')}>
+                {isRtl ? 'أو افتح ' : 'Or open '}
+                <Link
+                  href={adminPath('/admin/team')}
+                  className="text-primary underline font-medium"
+                >
+                  {isRtl ? 'فريق العمل' : 'Team members'}
+                </Link>
+                {isRtl
+                  ? ' من القائمة — البانر في أول الصفحة.'
+                  : ' in the sidebar — banner is at the top.'}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
