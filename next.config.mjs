@@ -2,7 +2,8 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
-const backUrl = (process.env.NEXT_PUBLIC_BACK_URL || 'http://localhost:5000').replace(/\/$/, '')
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+const backUrl = (process.env.NEXT_PUBLIC_BACK_URL || apiUrl.replace(/\/api\/?$/, '')).replace(/\/$/, '')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

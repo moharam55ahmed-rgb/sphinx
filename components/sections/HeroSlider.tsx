@@ -66,6 +66,7 @@ export function HeroSlider({ data }: { data?: any }) {
             fill
             className="object-cover"
             priority
+            unoptimized
           />
           <div className="absolute inset-0 hero-overlay" />
         </motion.div>

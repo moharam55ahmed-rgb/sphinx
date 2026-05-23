@@ -10,6 +10,7 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
 import { toYoutubeEmbedUrl } from '@/lib/navigation';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function VideoIntroSection({ data }: { data?: any }) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -25,8 +26,9 @@ export function VideoIntroSection({ data }: { data?: any }) {
     return null;
   }, [data]);
 
-  const thumbnail =
-    data?.image || '/images/videos/video-3.jpg';
+  const thumbnail = resolveMediaUrl(
+    data?.image || '/images/videos/video-3.jpg'
+  );
 
   return (
     <section className="py-24 bg-background" dir={isRtl ? 'rtl' : 'ltr'}>
@@ -49,6 +51,7 @@ export function VideoIntroSection({ data }: { data?: any }) {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                unoptimized
               />
               <motion.div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                 <motion.span

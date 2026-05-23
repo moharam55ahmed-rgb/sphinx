@@ -8,13 +8,16 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function AboutPreview({ data }: { data?: any }) {
   const t = useTranslations('sections');
   const tCta = useTranslations('cta');
   const locale = useLocale();
   const isRtl = locale === 'ar';
-  const aboutImage = data?.image || '/images/projects/solaria-mall.jpg';
+  const aboutImage = resolveMediaUrl(
+    data?.image || '/images/hero/hero-1.jpg'
+  );
 
   return (
     <section className="py-24 relative overflow-hidden" dir={isRtl ? 'rtl' : 'ltr'}>
@@ -30,6 +33,7 @@ export function AboutPreview({ data }: { data?: any }) {
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
+                  unoptimized
                 />
               </div>
               <div className={cn(

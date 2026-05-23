@@ -1,4 +1,5 @@
 import { t as translate } from '@/lib/translate';
+import { toMediaPath } from '@/lib/media-url';
 
 export type BilingualText = { en: string; ar: string };
 
@@ -52,7 +53,7 @@ export function prepareCompaniesForEditor(raw: unknown): RelatedCompanyRecord[] 
   return items.map((item, index) => ({
     id: String(item.id ?? `company-${index + 1}`),
     name: normalizeBilingual(item.name ?? item.title),
-    logo: item.logo ?? item.image ?? '',
+    logo: toMediaPath(item.logo ?? item.image ?? ''),
     pageSlug: (item.pageSlug ?? item.slug ?? extractSlugFromLink(item.link) ?? '')
       .replace(/^\//, '')
       .replace(/^companies\//, ''),
@@ -81,7 +82,7 @@ export function normalizeRelatedCompanies(raw: unknown): RelatedCompanyRecord[] 
       return {
         id: String(item.id ?? `company-${index + 1}`),
         name,
-        logo: item.logo ?? item.image ?? '',
+        logo: toMediaPath(item.logo ?? item.image ?? ''),
         pageSlug,
         sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : index,
       };

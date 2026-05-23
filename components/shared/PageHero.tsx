@@ -26,6 +26,7 @@ export function PageHero({ title, subtitle, backgroundImage }: PageHeroProps) {
             fill
             className="object-cover"
             priority
+            unoptimized
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-secondary to-background" />

@@ -79,6 +79,7 @@ export function LatestNewsSection({ data }: { data?: any }) {
                         alt={title || ''}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        unoptimized
                       />
                       <div className={cn(
                         "absolute top-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full",

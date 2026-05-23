@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/select';
 import { formatBilingual } from '@/lib/translate';
 import { useAdminPath } from '@/lib/admin-path';
-import { resolveMediaUrl } from '@/lib/media-url';
+import { resolveMediaUrl, getAbsoluteMediaUrl } from '@/lib/media-url';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useLocale } from 'next-intl';
@@ -241,7 +241,7 @@ export default function MediaLibrary() {
                 </div>
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <Button size="icon" variant="secondary" onClick={() => handleCopyUrl(resolveMediaUrl(item.fileUrl), item.id)}>
+                <Button size="icon" variant="secondary" onClick={() => handleCopyUrl(getAbsoluteMediaUrl(item.fileUrl), item.id)}>
                   {copyingId === item.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
                 <Button size="icon" variant="secondary" onClick={() => startEdit(item)}>
