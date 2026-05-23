@@ -104,7 +104,7 @@ export function TeamContent() {
                     <div className="relative aspect-square overflow-hidden bg-secondary/50">
                       {member.image ? (
                         <Image
-                          src={`${BACK_URL}${member.image}`}
+                          src={`${BACK_URL ?BACK_URL : "https://sphinx.nodeteam.site" }${member.image}`}
                           alt={name}
                           fill
                           className="object-cover"
