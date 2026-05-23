@@ -23,6 +23,7 @@ import { siteInfo, projects, socialLinks as staticSocial } from '@/data/site';
 import { SocialLinks, resolveSocialLinks } from '@/components/shared/SocialLinks';
 import { t as translate } from '@/lib/translate';
 import { getSettingText } from '@/lib/contact-links';
+import { findSection, findPageHeroSection, getSectionHeroImage, type CmsSection } from '@/lib/section-media';
 
 function toHrefString(href: unknown): string {
   if (typeof href === 'string') return href;
@@ -37,12 +38,9 @@ function isExternalUrl(href: unknown): boolean {
   return s.startsWith('http://') || s.startsWith('https://');
 }
 
-function getContactHeroSection(pageData?: { sections?: Array<Record<string, unknown>> }) {
+function getContactHeroSection(pageData?: { sections?: CmsSection[] }) {
   const sections = pageData?.sections ?? [];
-  return (
-    sections.find((s) => s.sectionKey === 'contact-hero') ||
-    sections.find((s) => s.backgroundImage || s.image)
-  );
+  return findSection(sections, 'contact-hero') || findPageHeroSection(sections);
 }
 
 export function ContactContent({
@@ -138,9 +136,7 @@ export function ContactContent({
   const social = resolveSocialLinks(settings?.socialLinks, staticSocial);
 
   const heroSection = getContactHeroSection(pageData ?? undefined);
-  const heroImage =
-    (heroSection?.backgroundImage as string | undefined) ||
-    (heroSection?.image as string | undefined);
+  const heroImage = getSectionHeroImage(heroSection);
 
   return (
     <>

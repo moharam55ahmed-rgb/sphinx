@@ -52,3 +52,5 @@ export default async function CompanyPage({ params }: Props) {
 
   return <CompanyPageContent page={page} />;
 }
+
+export const revalidate = 0;

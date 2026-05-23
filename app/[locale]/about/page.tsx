@@ -33,3 +33,5 @@ export default async function AboutPage({ params }: Props) {
 
   return <AboutContent data={pageData} />;
 }
+
+export const revalidate = 0;

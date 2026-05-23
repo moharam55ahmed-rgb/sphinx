@@ -12,13 +12,14 @@ import { TeamMemberDialog } from '@/components/team/TeamMemberDialog';
 import { cn } from '@/lib/utils';
 import { teamMembers as staticTeam } from '@/data/site';
 import { getPageBySlug } from '@/lib/public-api';
+import { resolveMediaUrl } from '@/lib/media-url';
 import {
   normalizeTeamMembers,
   getMemberName,
   getMemberJobTitle,
   type TeamMemberRecord,
 } from '@/lib/team';
-import { resolveMediaUrl } from '@/lib/media-url';
+import { findPageHeroSection, getSectionHeroImage } from '@/lib/section-media';
 function staticToRecords(isRtl: boolean): TeamMemberRecord[] {
   return staticTeam.map((m) => ({
     id: m.id,
@@ -46,6 +47,7 @@ export function TeamContent() {
   const locale = useLocale();
   const isRtl = locale === 'ar';
   const [members, setMembers] = useState<TeamMemberRecord[]>([]);
+  const [heroImage, setHeroImage] = useState('/images/hero/hero-1.jpg');
   const [selected, setSelected] = useState<TeamMemberRecord | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -53,6 +55,9 @@ export function TeamContent() {
     const load = async () => {
       try {
         const page = await getPageBySlug('team');
+        const hero = getSectionHeroImage(findPageHeroSection(page?.sections));
+        if (hero) setHeroImage(hero);
+
         const section = page?.sections?.find(
           (s: { sectionKey: string }) => s.sectionKey === 'team-members'
         );
@@ -79,7 +84,7 @@ export function TeamContent() {
       <PageHero
         title={t('ourTeam')}
         subtitle={t('teamIntro')}
-        backgroundImage="/images/hero/hero-1.jpg"
+        backgroundImage={heroImage}
       />
 
       <section className="py-20 bg-background">

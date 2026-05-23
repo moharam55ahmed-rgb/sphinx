@@ -20,3 +20,5 @@ export default async function CareersPage({ params }: Props) {
 
   return <CareersContent />;
 }
+
+export const revalidate = 0;

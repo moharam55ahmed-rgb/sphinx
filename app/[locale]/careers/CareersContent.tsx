@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { jobs as staticJobs } from '@/data/site';
 import { getPageBySlug } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
+import { findPageHeroSection, getSectionHeroImage } from '@/lib/section-media';
 
 type JobItem = {
   id: string;
@@ -52,6 +53,7 @@ function mapApiJobs(custom: unknown[], locale: string): JobItem[] {
 export function CareersContent() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [jobs, setJobs] = useState<JobItem[]>([]);
+  const [heroImage, setHeroImage] = useState('/images/hero/hero-5.jpg');
   const t = useTranslations('sections');
   const tForm = useTranslations('form');
   const tCta = useTranslations('cta');
@@ -62,6 +64,9 @@ export function CareersContent() {
     const load = async () => {
       try {
         const page = await getPageBySlug('careers');
+        const hero = getSectionHeroImage(findPageHeroSection(page?.sections));
+        if (hero) setHeroImage(hero);
+
         const section = page?.sections?.find(
           (s: { sectionKey: string }) => s.sectionKey === 'careers-list'
         );
@@ -90,7 +95,7 @@ export function CareersContent() {
       <PageHero
         title={t('careersTitle')}
         subtitle={t('careersIntro')}
-        backgroundImage="/images/hero/hero-5.jpg"
+        backgroundImage={heroImage}
       />
 
       <section className="py-16 bg-background" dir={isRtl ? 'rtl' : 'ltr'}>

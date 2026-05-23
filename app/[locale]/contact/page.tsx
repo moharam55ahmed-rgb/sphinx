@@ -37,3 +37,5 @@ export default async function ContactPage({ params }: Props) {
 
   return <ContactContent pageData={pageData} />;
 }
+
+export const revalidate = 0;

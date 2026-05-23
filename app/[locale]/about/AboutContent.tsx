@@ -8,6 +8,7 @@ import { StatsSection } from '@/components/shared/StatsSection';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { findSection, getSectionHeroImage } from '@/lib/section-media';
 
 export function AboutContent({ data }: { data?: any }) {
   const t = useTranslations('sections');
@@ -15,7 +16,7 @@ export function AboutContent({ data }: { data?: any }) {
   const isRtl = locale === 'ar';
 
   const sections = data?.sections || [];
-  const getSection = (key: string) => sections.find((s: any) => s.sectionKey === key);
+  const getSection = (key: string) => findSection(sections, key);
 
   const vmvData = getSection('about-vmv');
   const defaultIcons = [Eye, Target, Heart];
@@ -46,13 +47,14 @@ export function AboutContent({ data }: { data?: any }) {
       ];
 
   const mainContent = getSection('about-main');
-
+  const heroImage =
+    getSectionHeroImage(mainContent) || '/images/hero/hero-1.jpg';
 
   return (
     <>
       <PageHero
         title={data?.title || t('aboutUs')}
-        backgroundImage={data?.image || "/images/hero/hero-1.jpg"}
+        backgroundImage={heroImage}
       />
 
       {/* Main About Content */}

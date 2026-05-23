@@ -7,6 +7,8 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { getSectionHeroImage } from '@/lib/section-media';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function CompanyPageContent({ page }: { page: { title?: unknown; sections?: Array<Record<string, unknown>> } }) {
   const locale = useLocale();
@@ -18,10 +20,7 @@ export function CompanyPageContent({ page }: { page: { title?: unknown; sections
 
   const title = translate(page?.title ?? hero?.title, locale);
   const subtitle = hero?.subtitle ? translate(hero.subtitle, locale) : undefined;
-  const heroImage =
-    (hero?.backgroundImage as string) ||
-    (hero?.image as string) ||
-    undefined;
+  const heroImage = getSectionHeroImage(hero as { image?: string; backgroundImage?: string });
 
   return (
     <>
@@ -34,7 +33,7 @@ export function CompanyPageContent({ page }: { page: { title?: unknown; sections
               <AnimatedReveal>
                 <div className="relative aspect-video rounded-2xl overflow-hidden mb-10 border border-border">
                   <Image
-                    src={main.image as string}
+                    src={resolveMediaUrl(main.image as string)}
                     alt={title}
                     fill
                     className="object-cover"
