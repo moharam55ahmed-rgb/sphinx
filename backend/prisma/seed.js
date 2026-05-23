@@ -1,6 +1,5 @@
 require('dotenv').config();
-const { PrismaClient } = require('@prisma/client');
-const { PrismaMariaDb } = require('@prisma/adapter-mariadb');
+const prisma = require('../src/config/prisma');
 const bcrypt = require('bcryptjs');
 const {
   projectsData,
@@ -18,21 +17,6 @@ const {
   newsCategoriesData,
   galleryCategoriesData,
 } = require('./seed-data');
-
-const dbUrl = process.env.DATABASE_URL;
-const urlPattern = /mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/;
-const matches = dbUrl ? dbUrl.match(urlPattern) : null;
-
-let adapterOptions;
-if (matches) {
-  const [, user, password, host, port, database] = matches;
-  adapterOptions = { user, password, host, port: parseInt(port, 10), database };
-} else {
-  adapterOptions = { host: 'localhost', port: 3306, user: 'root', password: '', database: 'sphinx_db' };
-}
-
-const adapter = new PrismaMariaDb(adapterOptions);
-const prisma = new PrismaClient({ adapter });
 
 async function upsertSection(section) {
   const { pageId, sectionKey, ...data } = section;
