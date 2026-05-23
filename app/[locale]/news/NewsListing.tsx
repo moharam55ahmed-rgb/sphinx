@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { news as staticNews } from '@/data/site';
 import { getNews, getNewsCategories } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 import {
   buildNewsFilterTabs,
   getNewsCategoryLabel,
@@ -39,7 +40,7 @@ function normalizeNewsItem(item: any, locale: string): NewsListItem {
       slug: item.slug,
       title: locale === 'ar' ? item.titleAr : item.titleEn,
       excerpt: locale === 'ar' ? item.excerptAr : item.excerptEn,
-      image: item.image,
+      image: item.image ? resolveMediaUrl(item.image) : item.image,
       date: item.date,
       category: item.category,
     };
@@ -52,7 +53,7 @@ function normalizeNewsItem(item: any, locale: string): NewsListItem {
     slug: item.slug,
     title: translate(item.title, locale),
     excerpt: translate(item.excerpt || item.shortDescription, locale),
-    image: item.mainImage || '/images/news/news-1.jpg',
+    image: resolveMediaUrl(item.mainImage || '/images/news/news-1.jpg'),
     date: published,
     category: item.category,
   };

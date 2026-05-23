@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { getProjects } from '@/lib/public-api';
 import { projects as staticProjects } from '@/data/site';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function ProjectsSection({ data }: { data?: any }) {
   const t = useTranslations('sections');
@@ -72,7 +73,7 @@ export function ProjectsSection({ data }: { data?: any }) {
                     {/* Image */}
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image
-                        src={project.mainImage || project.image || '/images/placeholder.jpg'}
+                        src={resolveMediaUrl(project.mainImage || project.image || '/images/placeholder.jpg')}
                         alt={title || ''}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"

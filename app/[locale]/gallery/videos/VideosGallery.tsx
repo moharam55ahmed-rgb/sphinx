@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { videos } from '@/data/site';
 import { getGallery, getGalleryCategories } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function VideosGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -67,7 +68,7 @@ export function VideosGallery() {
                   typeof titleObj === 'object' ? titleObj.ar : item.originalName,
                 titleEn:
                   typeof titleObj === 'object' ? titleObj.en : item.originalName,
-                thumbnail: item.fileUrl || '/images/video-thumbnail.jpg',
+                thumbnail: resolveMediaUrl(item.fileUrl) || '/images/video-thumbnail.jpg',
                 fileUrl: item.fileUrl,
                 youtubeId: 'dQw4w9WgXcQ',
                 project: item.galleryCategory?.slug || 'all',
@@ -136,7 +137,7 @@ export function VideosGallery() {
                   )}
                   onClick={() => {
                     if (video.youtubeId) setSelectedVideo(video.youtubeId);
-                    else if (video.fileUrl) setSelectedFileUrl(video.fileUrl);
+                    else if (video.fileUrl) setSelectedFileUrl(resolveMediaUrl(video.fileUrl));
                   }}
                 >
                   <div className="relative aspect-video overflow-hidden">

@@ -12,6 +12,7 @@ import { SectionHeading } from '@/components/shared/SectionHeading';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export interface NewsDetailItem {
   id: string;
@@ -58,7 +59,7 @@ function getContent(item: NewsDetailItem, locale: string) {
 }
 
 function getImage(item: NewsDetailItem) {
-  return item.mainImage || item.image || '/images/news/news-1.jpg';
+  return resolveMediaUrl(item.mainImage || item.image || '/images/news/news-1.jpg');
 }
 
 function getDate(item: NewsDetailItem, locale: string) {

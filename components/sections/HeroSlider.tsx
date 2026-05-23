@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { heroSlides } from '@/data/site';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function HeroSlider({ data }: { data?: any }) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -22,10 +23,11 @@ export function HeroSlider({ data }: { data?: any }) {
     data?.customData && Array.isArray(data.customData) && data.customData.length > 0
       ? data.customData.map((slide: any) => ({
           ...slide,
-          image:
+          image: resolveMediaUrl(
             typeof slide.image === 'string'
               ? slide.image
-              : slide.mainImage || '/images/hero/hero-1.jpg',
+              : slide.mainImage || '/images/hero/hero-1.jpg'
+          ),
         }))
       : heroSlides;
 

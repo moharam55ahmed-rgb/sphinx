@@ -12,6 +12,7 @@ import { SectionHeading } from '@/components/shared/SectionHeading';
 import { cn } from '@/lib/utils';
 import { getNews } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function LatestNewsSection({ data }: { data?: any }) {
   const t = useTranslations('sections');
@@ -74,7 +75,7 @@ export function LatestNewsSection({ data }: { data?: any }) {
                   >
                     <div className="relative aspect-video overflow-hidden">
                       <Image
-                        src={item.mainImage || item.image || '/images/placeholder.jpg'}
+                        src={resolveMediaUrl(item.mainImage || item.image || '/images/placeholder.jpg')}
                         alt={title || ''}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"

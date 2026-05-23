@@ -13,6 +13,7 @@ import { Globe, Share2, Code, AlertCircle } from 'lucide-react';
 import { MediaSelector } from '@/components/admin/MediaSelector';
 import { toast } from 'sonner';
 import { useAdminPath } from '@/lib/admin-path';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export default function CreateSEORecord() { return <SEOForm /> }
 
@@ -173,7 +174,7 @@ export function SEOForm({ initialData }: any) {
               <div className="space-y-2">
                 <Label>OG Image</Label>
                 <div className="flex gap-4 items-center">
-                  {formData.ogImage && <img src={formData.ogImage} className="w-20 h-20 object-cover rounded border" />}
+                  {formData.ogImage && <img src={resolveMediaUrl(formData.ogImage)} className="w-20 h-20 object-cover rounded border" />}
                   <MediaSelector onSelect={(url) => updateField('ogImage', url)} />
                 </div>
               </div>
@@ -237,7 +238,7 @@ export function SEOForm({ initialData }: any) {
               <div className="bg-[#f2f3f5] overflow-hidden border rounded-b-lg">
                 <div className="aspect-[1200/630] bg-muted relative flex items-center justify-center">
                   {formData.ogImage ? (
-                    <img src={formData.ogImage} className="w-full h-full object-cover" />
+                    <img src={resolveMediaUrl(formData.ogImage)} className="w-full h-full object-cover" />
                   ) : (
                     <Globe className="w-12 h-12 text-muted-foreground opacity-20" />
                   )}

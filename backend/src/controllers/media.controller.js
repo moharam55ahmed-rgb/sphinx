@@ -1,13 +1,12 @@
 const service = require('../services/media.service');
-const env = require('../config/env');
 
 exports.uploadFile = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
-    
-    const fileUrl = `${env.backendUrl}/uploads/${req.file.filename}`;
+
+    const fileUrl = `/uploads/${req.file.filename}`;
     
     const showInGallery =
       req.body.showInGallery === true ||

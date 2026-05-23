@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ImageIcon, Upload } from 'lucide-react';
 import Image from 'next/image';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function MediaSelector({ onSelect, triggerText = "Select Image" }: { onSelect: (url: string) => void, triggerText?: string }) {
   const [media, setMedia] = useState<any[]>([]);
@@ -55,7 +56,7 @@ export function MediaSelector({ onSelect, triggerText = "Select Image" }: { onSe
             {media.map(m => (
               <div key={m.id} className="relative aspect-square border rounded-md overflow-hidden cursor-pointer hover:border-primary"
                    onClick={() => { onSelect(m.fileUrl); setOpen(false); }}>
-                <img src={m.fileUrl} alt={m.altText || ''} className="object-cover w-full h-full" />
+                <img src={resolveMediaUrl(m.fileUrl)} alt={m.altText || ''} className="object-cover w-full h-full" />
               </div>
             ))}
           </div>

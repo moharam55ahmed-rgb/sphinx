@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MediaSelector } from '@/components/admin/MediaSelector';
+import { resolveMediaUrl } from '@/lib/media-url';
 import {
   Select,
   SelectContent,
@@ -190,7 +191,7 @@ export function ProjectForm({ initialData }: { initialData?: any }) {
         <div className="flex flex-col gap-4 p-4 border border-dashed rounded-lg bg-muted/30">
           {formData.mainImage && (
             <div className="relative w-full h-48 rounded-lg overflow-hidden border">
-              <img src={formData.mainImage} alt="Preview" className="w-full h-full object-cover" />
+              <img src={resolveMediaUrl(formData.mainImage)} alt="Preview" className="w-full h-full object-cover" />
               <Button 
                 type="button" 
                 variant="destructive" 
@@ -275,7 +276,7 @@ export function ProjectForm({ initialData }: { initialData?: any }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {(formData.gallery || []).map((url: string, index: number) => (
             <div key={`${url}-${index}`} className="relative aspect-[4/3] rounded-lg overflow-hidden border">
-              <img src={url} alt="" className="w-full h-full object-cover" />
+              <img src={resolveMediaUrl(url)} alt="" className="w-full h-full object-cover" />
               <Button
                 type="button"
                 variant="destructive"

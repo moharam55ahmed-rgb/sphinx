@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getSettings } from '@/lib/public-api';
 import { useAdminPath } from '@/lib/admin-path';
 import { useTranslations } from 'next-intl';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 type AdminBrandProps = {
   compact?: boolean;
@@ -25,7 +26,7 @@ export function AdminBrand({ compact = false }: AdminBrandProps) {
       .catch(() => {});
   }, []);
 
-  const src = logoUrl || '/favicon.svg';
+  const src = logoUrl ? resolveMediaUrl(logoUrl) : '/favicon.svg';
 
   return (
     <Link href={adminPath('/admin')} className="flex items-center gap-3 min-w-0">

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 interface PageHeroProps {
   title: string | Record<string, string>;
@@ -20,7 +21,7 @@ export function PageHero({ title, subtitle, backgroundImage }: PageHeroProps) {
       <div className="absolute inset-0">
         {backgroundImage ? (
           <Image
-            src={backgroundImage}
+            src={resolveMediaUrl(backgroundImage)}
             alt=""
             fill
             className="object-cover"

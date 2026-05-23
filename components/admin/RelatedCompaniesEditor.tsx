@@ -13,6 +13,7 @@ import {
   MAX_RELATED_COMPANIES,
   type RelatedCompanyRecord,
 } from '@/lib/related-companies';
+import { resolveMediaUrl } from '@/lib/media-url';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useAdminPath } from '@/lib/admin-path';
@@ -197,7 +198,7 @@ export function RelatedCompaniesEditor({
                     {company.logo && (
                       <div className="h-20 w-32 rounded-lg border overflow-hidden bg-muted">
                         <img
-                          src={company.logo}
+                          src={resolveMediaUrl(company.logo)}
                           alt=""
                           className="h-full w-full object-cover"
                         />

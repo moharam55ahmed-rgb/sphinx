@@ -16,6 +16,7 @@ import { normalizeTeamMembers } from '@/lib/team';
 import { normalizeRelatedCompanies } from '@/lib/related-companies';
 import { toast } from 'sonner';
 import { useLocale } from 'next-intl';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export default function CreateSection() { return <SectionForm /> }
 
@@ -360,7 +361,7 @@ export function SectionForm({ initialData }: any) {
                       <div className="space-y-1">
                         <Label className="text-xs">Image</Label>
                         <div className="flex gap-2 items-center">
-                          {item.image && <img src={item.image} className="h-10 w-10 object-cover rounded" />}
+                          {item.image && <img src={resolveMediaUrl(item.image)} className="h-10 w-10 object-cover rounded" />}
                           <MediaSelector onSelect={(url) => updateCustomItemScalar(item.id, 'image', url)} triggerText="Pick" />
                         </div>
                       </div>
@@ -382,7 +383,7 @@ export function SectionForm({ initialData }: any) {
               <div className="space-y-2">
                 <Label>Main Image</Label>
                 <div className="space-y-2">
-                  {formData.image && <img src={formData.image} className="w-full aspect-video object-cover rounded border" />}
+                  {formData.image && <img src={resolveMediaUrl(formData.image)} className="w-full aspect-video object-cover rounded border" />}
                   <MediaSelector onSelect={(url) => updateField('image', url)} triggerText={formData.image ? "Change Image" : "Select Image"} />
                 </div>
               </div>
@@ -390,7 +391,7 @@ export function SectionForm({ initialData }: any) {
               <div className="space-y-2">
                 <Label>Background Image</Label>
                 <div className="space-y-2">
-                  {formData.backgroundImage && <img src={formData.backgroundImage} className="w-full aspect-video object-cover rounded border" />}
+                  {formData.backgroundImage && <img src={resolveMediaUrl(formData.backgroundImage)} className="w-full aspect-video object-cover rounded border" />}
                   <MediaSelector onSelect={(url) => updateField('backgroundImage', url)} triggerText={formData.backgroundImage ? "Change Background" : "Select Background"} />
                 </div>
               </div>

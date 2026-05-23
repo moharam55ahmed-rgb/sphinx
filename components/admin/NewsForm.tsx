@@ -12,6 +12,7 @@ import { MediaSelector } from '@/components/admin/MediaSelector';
 import { toast } from 'sonner';
 import { useAdminPath } from '@/lib/admin-path';
 import { formatBilingual } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function NewsForm({ initialData }: { initialData?: any }) {
   const router = useRouter();
@@ -175,7 +176,7 @@ export function NewsForm({ initialData }: { initialData?: any }) {
       <div className="space-y-2">
         <Label>Featured Image</Label>
         <div className="space-y-2">
-          {formData.mainImage && <img src={formData.mainImage} className="h-40 w-full object-cover rounded-lg border" />}
+          {formData.mainImage && <img src={resolveMediaUrl(formData.mainImage)} className="h-40 w-full object-cover rounded-lg border" />}
           <MediaSelector onSelect={url => setFormData({ ...formData, mainImage: url })} triggerText={formData.mainImage ? "Change Image" : "Select Image"} />
         </div>
       </div>

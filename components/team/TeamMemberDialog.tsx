@@ -19,6 +19,7 @@ import {
   getMemberBio,
   formatLinkedInUrl,
 } from '@/lib/team';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 type Props = {
   member: TeamMemberRecord | null;
@@ -63,7 +64,7 @@ export function TeamMemberDialog({ member, open, onOpenChange }: Props) {
               <div className="relative w-full max-w-[260px] aspect-[3/4] min-h-[220px] max-h-[min(70vh,380px)] mx-auto">
                 {member.image ? (
                   <Image
-                    src={member.image}
+                    src={resolveMediaUrl(member.image)}
                     alt={name}
                     fill
                     className="object-contain object-center"

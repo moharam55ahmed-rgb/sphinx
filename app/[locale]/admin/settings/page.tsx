@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MediaSelector } from '@/components/admin/MediaSelector';
 import { toast } from 'sonner';
 import { Settings as SettingsIcon, Phone, Share2, Info, Image as ImageIcon } from 'lucide-react';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export default function WebsiteSettings() {
   const [settings, setSettings] = useState<any>({});
@@ -223,7 +224,7 @@ export default function WebsiteSettings() {
                   <Label>Main Logo</Label>
                   <div className="p-4 border rounded-lg bg-muted/10 flex flex-col items-center gap-4">
                     {settings.logo?.url ? (
-                      <img src={settings.logo.url} className="h-20 object-contain" />
+                      <img src={resolveMediaUrl(settings.logo.url)} className="h-20 object-contain" />
                     ) : (
                       <div className="h-20 w-20 flex items-center justify-center border border-dashed rounded text-muted-foreground italic text-xs">No Logo</div>
                     )}
@@ -234,7 +235,7 @@ export default function WebsiteSettings() {
                   <Label>Favicon</Label>
                   <div className="p-4 border rounded-lg bg-muted/10 flex flex-col items-center gap-4">
                     {settings.favicon?.url ? (
-                      <img src={settings.favicon.url} className="h-10 w-10 object-contain" />
+                      <img src={resolveMediaUrl(settings.favicon.url)} className="h-10 w-10 object-contain" />
                     ) : (
                       <div className="h-10 w-10 flex items-center justify-center border border-dashed rounded text-muted-foreground italic text-xs">None</div>
                     )}

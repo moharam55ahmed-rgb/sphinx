@@ -16,6 +16,7 @@ import { CTASection } from '@/components/shared/CTASection';
 import { ProjectGallery } from '@/components/projects/ProjectGallery';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 import { projects, contactInfo } from '@/data/site';
 import { getSettings } from '@/lib/public-api';
 import {
@@ -291,7 +292,7 @@ export function ProjectDetail({ project }: { project: Record<string, unknown> })
                   >
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image
-                        src={p.image}
+                        src={resolveMediaUrl(p.image)}
                         alt={isRtl ? p.nameAr : p.nameEn}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"

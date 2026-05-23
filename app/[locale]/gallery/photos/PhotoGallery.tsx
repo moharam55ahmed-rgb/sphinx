@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { galleryImages } from '@/data/site';
 import { getGallery, getGalleryCategories } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function PhotoGallery() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -54,7 +55,7 @@ export function PhotoGallery() {
           setImages(
             data.map((item: any) => ({
               id: item.id,
-              src: item.fileUrl,
+              src: resolveMediaUrl(item.fileUrl),
               alt: item.altText || item.title || item.originalName || '',
               project: item.galleryCategory?.slug || 'all',
             }))

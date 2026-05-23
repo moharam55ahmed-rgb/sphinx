@@ -2,6 +2,8 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
+const backUrl = (process.env.NEXT_PUBLIC_BACK_URL || 'http://localhost:5000').replace(/\/$/, '')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -9,6 +11,21 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: backUrl.startsWith('https') ? 'https' : 'http',
+        hostname: new URL(backUrl).hostname,
+        pathname: '/uploads/**',
+      },
+    ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: `${backUrl}/uploads/:path*`,
+      },
+    ]
   },
 }
 

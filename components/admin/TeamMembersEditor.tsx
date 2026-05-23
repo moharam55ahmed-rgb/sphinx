@@ -9,6 +9,7 @@ import { Plus, Trash2, Users } from 'lucide-react';
 import { MediaSelector } from '@/components/admin/MediaSelector';
 import { normalizeTeamMembers, type TeamMemberRecord } from '@/lib/team';
 import { cn } from '@/lib/utils';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 type Props = {
   members: TeamMemberRecord[];
@@ -177,7 +178,7 @@ export function TeamMembersEditor({
                 <div className="flex gap-2 items-center">
                   {member.image && (
                     <img
-                      src={member.image}
+                      src={resolveMediaUrl(member.image)}
                       alt=""
                       className="h-14 w-14 object-cover rounded border"
                     />

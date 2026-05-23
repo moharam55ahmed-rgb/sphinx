@@ -17,6 +17,7 @@ import { getProjects, getCategories } from '@/lib/public-api';
 import { projects as staticProjects } from '@/data/site';
 
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 export function ProjectsListing() {
   const [activeFilter, setActiveFilter] = useState<string>('all');
@@ -106,7 +107,7 @@ export function ProjectsListing() {
                     {/* Image */}
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image
-                        src={project.mainImage || project.image}
+                        src={resolveMediaUrl(project.mainImage || project.image)}
                         alt={translate(project.title, locale)}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"

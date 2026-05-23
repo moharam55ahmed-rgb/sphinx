@@ -9,6 +9,7 @@ import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 import {
   parseRelatedCompaniesCustomData,
   getCompanyName,
@@ -74,7 +75,7 @@ export function RelatedCompaniesSection({
                 <div className="absolute inset-0">
                   {company.logo ? (
                     <Image
-                      src={company.logo}
+                      src={resolveMediaUrl(company.logo)}
                       alt={name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

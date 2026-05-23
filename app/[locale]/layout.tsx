@@ -13,6 +13,7 @@ import { LocaleHtmlAttributes } from '@/components/providers/locale-html-attribu
 import { VisitTracker } from '@/components/analytics/VisitTracker';
 import { getSeoBySlug, getSettings } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -71,7 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? translate(seo.metaDescription, locale)
     : defaultDescription;
 
-  const faviconUrl = settings?.favicon?.url || '/favicon.svg';
+  const faviconUrl = resolveMediaUrl(settings?.favicon?.url || '/favicon.svg');
   const faviconType = faviconUrl.endsWith('.svg')
     ? 'image/svg+xml'
     : faviconUrl.endsWith('.png')
@@ -95,7 +96,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             seo.ogDescription || seo.metaDescription,
             locale
           ),
-          images: seo.ogImage ? [{ url: seo.ogImage }] : [],
+          images: seo.ogImage ? [{ url: resolveMediaUrl(seo.ogImage) }] : [],
         }
       : undefined,
     twitter: seo
@@ -108,7 +109,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             seo.twitterDescription || seo.ogDescription || seo.metaDescription,
             locale
           ),
-          images: seo.twitterImage ? [seo.twitterImage] : [],
+          images: seo.twitterImage ? [resolveMediaUrl(seo.twitterImage)] : [],
         }
       : undefined,
     alternates: {

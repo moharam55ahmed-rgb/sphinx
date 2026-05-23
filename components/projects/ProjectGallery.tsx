@@ -8,6 +8,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { cn } from '@/lib/utils';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 type ProjectGalleryProps = {
   images: string[];
@@ -48,7 +49,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
                 className="relative aspect-[4/3] rounded-xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <Image
-                  src={src}
+                  src={resolveMediaUrl(src)}
                   alt={`${title} - ${index + 1}`}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -131,7 +132,7 @@ export function ProjectGallery({ images, title }: ProjectGalleryProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={images[currentIndex]}
+                src={resolveMediaUrl(images[currentIndex])}
                 alt={`${title} - ${currentIndex + 1}`}
                 fill
                 className="object-contain"
