@@ -17,6 +17,7 @@ import { normalizeRelatedCompanies } from '@/lib/related-companies';
 import { toast } from 'sonner';
 import { useLocale } from 'next-intl';
 import { resolveMediaUrl } from '@/lib/media-url';
+import { useAdminPath } from '@/lib/admin-path';
 
 export default function CreateSection() { return <SectionForm /> }
 
@@ -61,14 +62,20 @@ function normalizeCustomData(raw: unknown, sectionKey?: string): any[] {
   if (Array.isArray(raw)) items = raw;
   else if (raw && typeof raw === 'object') items = Object.values(raw as object);
 
-  return items.map((item, index) => ({
-    id: item.id ?? `item-${index}-${crypto.randomUUID?.() ?? Date.now()}`,
-    title: normalizeTranslatable(item.title),
-    text: normalizeTranslatable(item.text ?? item.description),
-    icon: item.icon ?? '',
-    image: item.image ?? '',
-    link: item.link ?? item.buttonUrl ?? '',
-  }));
+  return items.map((item, index) => {
+    const entry: Record<string, unknown> = {
+      id: item.id ?? `item-${index}-${crypto.randomUUID?.() ?? Date.now()}`,
+      title: normalizeTranslatable(item.title),
+      text: normalizeTranslatable(item.text ?? item.description ?? item.subtitle),
+      icon: item.icon ?? '',
+      image: item.image ?? '',
+      link: item.link ?? item.buttonUrl ?? '',
+    };
+    if (item.subtitle) {
+      entry.subtitle = normalizeTranslatable(item.subtitle);
+    }
+    return entry;
+  });
 }
 
 export function normalizeSectionForm(data?: any) {
@@ -94,8 +101,28 @@ export function normalizeSectionForm(data?: any) {
   };
 }
 
+export function buildSectionPayload(formData: Record<string, unknown>) {
+  return {
+    pageId: formData.pageId,
+    sectionKey: formData.sectionKey,
+    sectionName: formData.sectionName || formData.sectionKey,
+    title: formData.title,
+    subtitle: formData.subtitle,
+    description: formData.description,
+    buttonText: formData.buttonText,
+    buttonUrl: formData.buttonUrl || '',
+    image: formData.image || '',
+    backgroundImage: formData.backgroundImage || '',
+    videoUrl: formData.videoUrl || '',
+    customData: formData.customData ?? [],
+    sortOrder: Number(formData.sortOrder) || 0,
+    isActive: formData.isActive !== false,
+  };
+}
+
 export function SectionForm({ initialData }: any) {
   const router = useRouter();
+  const adminPath = useAdminPath();
   const locale = useLocale();
   const isRtl = locale === 'ar';
   const isEdit = !!initialData;
@@ -180,10 +207,11 @@ export function SectionForm({ initialData }: any) {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isEdit) await apiClient.put(`/sections/${initialData.id}`, formData);
-      else await apiClient.post('/sections', formData);
+      const payload = buildSectionPayload(formData);
+      if (isEdit) await apiClient.put(`/sections/${initialData.id}`, payload);
+      else await apiClient.post('/sections', payload);
       toast.success("Section saved");
-      router.push('/admin/pages'); // Redirect to pages since sections are managed there
+      router.push(adminPath('/admin/pages'));
       router.refresh();
     } catch (err) {
       toast.error("Failed to save section");

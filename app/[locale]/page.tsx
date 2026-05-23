@@ -12,6 +12,8 @@ import { RelatedCompaniesSection } from '@/components/sections/RelatedCompaniesS
 import { findRelatedCompaniesSection } from '@/lib/related-companies';
 import { CTASection } from '@/components/shared/CTASection';
 
+export const revalidate = 0;
+
 type Props = {
   params: Promise<{ locale: string }>;
 };

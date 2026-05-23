@@ -9,15 +9,22 @@ const publicApi = axios.create({
   },
 });
 
-export const getHomeData = async () => {
-  const res = await publicApi.get('/public/home');
-  return res.data.data;
-};
+/** Fresh CMS data for server components — bypasses Next.js static cache */
+async function cmsFetch<T>(path: string): Promise<T> {
+  const res = await fetch(`${baseURL}${path}`, {
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(`CMS fetch failed: ${path} (${res.status})`);
+  }
+  const json = await res.json();
+  return json.data as T;
+}
 
-export const getPageBySlug = async (slug: string) => {
-  const res = await publicApi.get(`/public/pages/${slug}`);
-  return res.data.data;
-};
+export const getHomeData = async () => cmsFetch<any[]>('/public/home');
+
+export const getPageBySlug = async (slug: string) => cmsFetch<any>(`/public/pages/${slug}`);
 
 export const getProjects = async (params = {}) => {
   const res = await publicApi.get('/public/projects', { params });
@@ -34,10 +41,7 @@ export const getCategories = async () => {
   return res.data.data;
 };
 
-export const getSettings = async () => {
-  const res = await publicApi.get('/public/settings');
-  return res.data.data;
-};
+export const getSettings = async () => cmsFetch<Record<string, unknown>>('/public/settings');
 
 export const getNavigation = async (location: string) => {
   const res = await publicApi.get(`/public/navigation/${location}`);
@@ -48,9 +52,8 @@ export const getSeoBySlug = async (slug: string) => {
   try {
     const normalized =
       !slug || slug === '/' ? 'home' : slug.replace(/^\//, '');
-    const res = await publicApi.get(`/public/seo/${normalized}`);
-    return res.data.data;
-  } catch (error) {
+    return await cmsFetch<any>(`/public/seo/${normalized}`);
+  } catch {
     return null;
   }
 };
