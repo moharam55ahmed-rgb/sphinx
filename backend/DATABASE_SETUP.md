@@ -74,3 +74,21 @@ npm run prisma:seed
 npm run dev
 \`\`\`
 The server should now start successfully and connect to the database. You can test the login endpoint via Swagger at \`http://localhost:5000/api/docs\`.
+
+---
+
+## Production deploy (fix `MODULE_NOT_FOUND` / Prisma)
+
+After `git pull` on the server (e.g. `/var/www/api.citysphinx.com`):
+
+\`\`\`bash
+cd /var/www/api.citysphinx.com
+npm install
+npx prisma generate
+npx prisma db push
+npm run start
+\`\`\`
+
+`prisma generate` creates the client under `node_modules/.prisma/client`. Without it, Node crashes on startup.
+
+Use **full** `npm install` (not `npm install --omit=dev`) so the `prisma` CLI is available.
