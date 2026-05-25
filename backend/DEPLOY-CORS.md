@@ -35,18 +35,18 @@ Access-Control-Allow-Origin: *
 
 If you still see `sphinx-bay.vercel.app`, **Nginx** is adding it — edit the site config and remove any `add_header Access-Control-*` lines. See `nginx-cors.example.conf`.
 
-## 3. Point frontend to your API
+## 3. Point frontend to your API (Vercel / citysphinx.com)
 
-On Vercel / citysphinx.com build env:
+**Do not use** `sphinx.nodeteam.site` — it still sends old CORS (`sphinx-bay.vercel.app`).
+
+Set in Vercel → Project → Environment Variables:
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.citysphinx.com/api
+API_UPSTREAM_URL=https://api.citysphinx.com/api
 NEXT_PUBLIC_BACK_URL=https://api.citysphinx.com
 ```
 
-(Use `api.citysphinx.com` if that is where Node runs — not only `sphinx.nodeteam.site`.)
-
-Redeploy the frontend after changing env vars.
+Redeploy the frontend. The app calls `/api/proxy/...` on the same domain (no CORS); Next.js proxies to `api.citysphinx.com`.
 
 ## 4. Remove old FRONTEND_URL on server
 

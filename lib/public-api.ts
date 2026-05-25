@@ -1,9 +1,8 @@
 import axios from 'axios';
-
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { getApiBaseUrl } from '@/lib/api-base';
 
 const publicApi = axios.create({
-  baseURL,
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,7 +10,7 @@ const publicApi = axios.create({
 
 /** Fresh CMS data for server components — bypasses Next.js static cache */
 async function cmsFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${baseURL}${path}`, {
+  const res = await fetch(`${getApiBaseUrl()}${path}`, {
     cache: 'no-store',
     headers: { 'Content-Type': 'application/json' },
   });

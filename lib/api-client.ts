@@ -1,10 +1,8 @@
 import axios from 'axios';
-
-// Base API URL
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { getApiBaseUrl } from '@/lib/api-base';
 
 export const apiClient = axios.create({
-  baseURL,
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },

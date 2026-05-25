@@ -1,10 +1,10 @@
+import { getApiUpstreamOrigin } from '@/lib/api-base';
+
 /** Public backend origin — set NEXT_PUBLIC_BACK_URL in .env / Vercel */
 export function getMediaBaseUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_BACK_URL?.trim();
   if (fromEnv) return fromEnv.replace(/\/$/, '');
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-  return apiUrl.replace(/\/api\/?$/, '');
+  return getApiUpstreamOrigin();
 }
 
 /** Strip stored full URLs down to a path (legacy records). */
