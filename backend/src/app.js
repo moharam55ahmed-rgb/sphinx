@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const env = require('./config/env');
+const { getCorsOptions } = require('./config/cors');
 const { errorMiddleware } = require('./middlewares/error.middleware');
 
 const app = express();
@@ -12,9 +12,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-app.use(cors({
-  origin: '*',
-}));
+app.use(cors(getCorsOptions()));
 
 // Rate Limiting
 const limiter = rateLimit({
