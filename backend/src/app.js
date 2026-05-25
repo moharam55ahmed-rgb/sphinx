@@ -1,18 +1,17 @@
 const express = require('express');
-const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getCorsOptions } = require('./config/cors');
+const { allowAllCors } = require('./middlewares/cors.middleware');
 const { errorMiddleware } = require('./middlewares/error.middleware');
 
 const app = express();
 
-// Security Middlewares
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+// CORS first — allow all origins (*)
+app.use(allowAllCors);
 
-app.use(cors(getCorsOptions()));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -71,7 +70,11 @@ app.use('/api/gallery-categories', galleryCategoriesRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/public', publicRoutes);
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date() });
+  res.status(200).json({
+    status: 'ok',
+    cors: '*',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Error Handling
