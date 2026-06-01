@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { getHomeData } from '@/lib/public-api';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,18 +10,36 @@ import { Button } from '@/components/ui/button';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { cn } from '@/lib/utils';
 import { t as translate } from '@/lib/translate';
-import { toYoutubeEmbedUrl } from '@/lib/navigation';
+import { resolveSectionVideoUrl, toYoutubeEmbedUrl } from '@/lib/youtube';
 import { resolveMediaUrl } from '@/lib/media-url';
 
-export function VideoIntroSection({ data }: { data?: any }) {
+export function VideoIntroSection({ data: initialData }: { data?: any }) {
+  const [cmsData, setCmsData] = useState<any>(initialData);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  useEffect(() => {
+    getHomeData()
+      .then((sections) => {
+        const section = sections?.find(
+          (s: { sectionKey: string }) => s.sectionKey === 'video-intro'
+        );
+        if (section) setCmsData(section);
+      })
+      .catch(() => {});
+  }, []);
+
+  const data = cmsData ?? initialData;
   const t = useTranslations('sections');
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
   const embedUrl = useMemo(() => {
-    if (data?.videoUrl) return toYoutubeEmbedUrl(data.videoUrl);
+    const source = resolveSectionVideoUrl(data?.videoUrl, data?.buttonUrl);
+    if (source) {
+      const fromUrl = toYoutubeEmbedUrl(source);
+      if (fromUrl) return fromUrl;
+    }
     const youtubeId = data?.customData?.youtubeId;
     if (youtubeId) return toYoutubeEmbedUrl(String(youtubeId));
     return null;

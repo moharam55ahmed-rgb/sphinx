@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { useLocale } from 'next-intl';
 import { resolveMediaUrl } from '@/lib/media-url';
 import { useAdminPath } from '@/lib/admin-path';
+import { extractYoutubeId, normalizeYoutubeWatchUrl } from '@/lib/youtube';
 
 export default function CreateSection() { return <SectionForm /> }
 
@@ -102,6 +103,15 @@ export function normalizeSectionForm(data?: any) {
 }
 
 export function buildSectionPayload(formData: Record<string, unknown>) {
+  const rawVideo = String(formData.videoUrl || '').trim();
+  const rawButton = String(formData.buttonUrl || '').trim();
+  let videoUrl = rawVideo;
+  if (!extractYoutubeId(rawVideo) && extractYoutubeId(rawButton)) {
+    videoUrl = normalizeYoutubeWatchUrl(rawButton);
+  } else if (rawVideo) {
+    videoUrl = normalizeYoutubeWatchUrl(rawVideo);
+  }
+
   return {
     pageId: formData.pageId,
     sectionKey: formData.sectionKey,
@@ -113,7 +123,7 @@ export function buildSectionPayload(formData: Record<string, unknown>) {
     buttonUrl: formData.buttonUrl || '',
     image: formData.image || '',
     backgroundImage: formData.backgroundImage || '',
-    videoUrl: formData.videoUrl || '',
+    videoUrl,
     customData: formData.customData ?? [],
     sortOrder: Number(formData.sortOrder) || 0,
     isActive: formData.isActive !== false,
@@ -128,6 +138,7 @@ export function SectionForm({ initialData }: any) {
   const isEdit = !!initialData;
   const [formData, setFormData] = useState(() => normalizeSectionForm(initialData));
   const isTeamSection = formData.sectionKey === 'team-members';
+  const isVideoIntro = formData.sectionKey === 'video-intro';
   const isRelatedCompaniesSection = formData.sectionKey === 'related-companies';
   const [loading, setLoading] = useState(false);
   const [pages, setPages] = useState<any[]>([]);
@@ -303,18 +314,45 @@ export function SectionForm({ initialData }: any) {
                 />
               </div>
               
+              <div className="space-y-2">
+                <Label>
+                  {isRtl ? 'رابط فيديو يوتيوب' : 'YouTube video URL'}
+                  {isVideoIntro ? ' *' : ''}
+                </Label>
+                <Input
+                  value={formData.videoUrl ?? ''}
+                  onChange={(e) => updateField('videoUrl', e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=... أو youtu.be/..."
+                  dir="ltr"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {isRtl
+                    ? 'الضغط على زر التشغيل يستخدم هذا الحقل. مثال: https://youtu.be/eHMAGF9D1v4'
+                    : 'Play button uses this field. Example: https://youtu.be/eHMAGF9D1v4'}
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Button Text ({activeLang})</Label>
-                  <Input 
-                    value={formData.buttonText?.[activeLang] || ''} 
-                    onChange={e => updateTranslatable('buttonText', activeLang, e.target.value)} 
+                  <Label>
+                    {isRtl ? 'نص زر الفيديو' : 'Video label'} ({activeLang})
+                  </Label>
+                  <Input
+                    value={formData.buttonText?.[activeLang] || ''}
+                    onChange={(e) =>
+                      updateTranslatable('buttonText', activeLang, e.target.value)
+                    }
                     dir={activeLang === 'ar' ? 'rtl' : 'ltr'}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Button URL</Label>
-                  <Input value={formData.buttonUrl ?? ''} onChange={e => updateField('buttonUrl', e.target.value)} />
+                  <Label>{isRtl ? 'رابط زر (اختياري)' : 'Button link (optional)'}</Label>
+                  <Input
+                    value={formData.buttonUrl ?? ''}
+                    onChange={(e) => updateField('buttonUrl', e.target.value)}
+                    placeholder="/projects"
+                    dir="ltr"
+                  />
                 </div>
               </div>
             </CardContent>

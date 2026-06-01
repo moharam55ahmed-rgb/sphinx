@@ -102,13 +102,4 @@ export function navLabel(item: NavLink, locale: string): string {
   return translate(item.label, locale);
 }
 
-/** YouTube watch/share URL → embed URL */
-export function toYoutubeEmbedUrl(url: string): string | null {
-  if (!url) return null;
-  if (url.includes('/embed/')) return url;
-  const idMatch =
-    url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/) ||
-    url.match(/^([a-zA-Z0-9_-]{11})$/);
-  const id = idMatch?.[1];
-  return id ? `https://www.youtube.com/embed/${id}` : null;
-}
+export { toYoutubeEmbedUrl } from '@/lib/youtube';
