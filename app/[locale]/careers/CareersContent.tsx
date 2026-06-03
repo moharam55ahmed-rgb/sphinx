@@ -15,7 +15,7 @@ import { SectionHeading } from '@/components/shared/SectionHeading';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
 import { jobs as staticJobs } from '@/data/site';
-import { getPageBySlug } from '@/lib/public-api';
+import { getPageBySlug, submitCareersForm } from '@/lib/public-api';
 import { t as translate } from '@/lib/translate';
 import { getBannerImage } from '@/lib/page-banners';
 
@@ -54,6 +54,7 @@ export function CareersContent() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [jobs, setJobs] = useState<JobItem[]>([]);
   const [heroImage, setHeroImage] = useState('/images/hero/hero-5.jpg');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const t = useTranslations('sections');
   const tForm = useTranslations('form');
   const tCta = useTranslations('cta');
@@ -89,6 +90,32 @@ export function CareersContent() {
 
   const selectedTitle =
     jobs.find((j) => j.id === selectedJob)?.title ?? '';
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    try {
+      await submitCareersForm(fd);
+      alert(
+        isRtl
+          ? 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً.'
+          : 'Your application was sent successfully!'
+      );
+      form.reset();
+      setSelectedJob(null);
+    } catch {
+      alert(
+        isRtl
+          ? 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.'
+          : 'Error sending application. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -172,13 +199,15 @@ export function CareersContent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form className="space-y-6">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
                       <div className="space-y-2">
                         <Label htmlFor="name" className={cn(isRtl && 'block text-right')}>
                           {tForm('name')}
                         </Label>
                         <Input
                           id="name"
+                          name="name"
+                          required
                           className="bg-background border-border"
                           dir={isRtl ? 'rtl' : 'ltr'}
                         />
@@ -190,6 +219,7 @@ export function CareersContent() {
                         </Label>
                         <Input
                           id="phone"
+                          name="phone"
                           type="tel"
                           className="bg-background border-border"
                           dir="ltr"
@@ -202,7 +232,9 @@ export function CareersContent() {
                         </Label>
                         <Input
                           id="email"
+                          name="email"
                           type="email"
+                          required
                           className="bg-background border-border"
                           dir="ltr"
                         />
@@ -214,6 +246,7 @@ export function CareersContent() {
                         </Label>
                         <Input
                           id="position"
+                          name="position"
                           className="bg-background border-border"
                           dir={isRtl ? 'rtl' : 'ltr'}
                           defaultValue={selectedTitle}
@@ -227,6 +260,7 @@ export function CareersContent() {
                         </Label>
                         <Input
                           id="cv"
+                          name="cv"
                           type="file"
                           accept=".pdf,.doc,.docx"
                           className="bg-background border-border"
@@ -239,6 +273,7 @@ export function CareersContent() {
                         </Label>
                         <Textarea
                           id="message"
+                          name="message"
                           rows={4}
                           className="bg-background border-border resize-none"
                           dir={isRtl ? 'rtl' : 'ltr'}
@@ -247,10 +282,15 @@ export function CareersContent() {
 
                       <Button
                         type="submit"
+                        disabled={isSubmitting}
                         className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
                       >
                         <Send className="w-4 h-4" />
-                        {tCta('submitApplication')}
+                        {isSubmitting
+                          ? isRtl
+                            ? 'جاري الإرسال...'
+                            : 'Sending...'
+                          : tCta('submitApplication')}
                       </Button>
                     </form>
                   </CardContent>

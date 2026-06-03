@@ -9,5 +9,15 @@ module.exports = {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
-  backendUrl: `https://sphinx.nodeteam.site`,
+  backendUrl: process.env.BACKEND_URL || 'http://localhost:5000',
+  mail: {
+    notifyTo: process.env.NOTIFY_EMAIL || 'info@citysphinx.com',
+    from: process.env.MAIL_FROM || 'City Sphinx <noreply@citysphinx.com>',
+    replyTo: process.env.MAIL_REPLY_TO || 'info@citysphinx.com',
+    smtpHost: process.env.SMTP_HOST || '',
+    smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
+    smtpSecure: process.env.SMTP_SECURE === 'true',
+    smtpUser: process.env.SMTP_USER || '',
+    smtpPass: process.env.SMTP_PASS || '',
+  },
 };

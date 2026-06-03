@@ -108,6 +108,13 @@ exports.submitContact = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+exports.submitCareers = async (req, res, next) => {
+  try {
+    const data = await service.submitCareersApplication(req.body, req.file);
+    res.status(201).json({ success: true, data, message: 'Application submitted successfully' });
+  } catch (err) { next(err); }
+};
+
 exports.recordVisit = async (req, res, next) => {
   try {
     const analytics = require('../services/analytics.service');

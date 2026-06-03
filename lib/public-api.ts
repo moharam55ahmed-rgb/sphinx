@@ -62,8 +62,21 @@ export const getNewsBySlug = async (slug: string) => {
   return res.data.data;
 };
 
-export const submitContactForm = async (data: any) => {
+export const submitContactForm = async (data: {
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: string;
+  message: string;
+}) => {
   const res = await publicApi.post('/public/contact', data);
+  return res.data;
+};
+
+export const submitCareersForm = async (formData: FormData) => {
+  const res = await publicApi.post('/public/careers', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return res.data;
 };
 

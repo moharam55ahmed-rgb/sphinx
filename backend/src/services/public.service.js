@@ -125,6 +125,8 @@ exports.getGallery = async (type, categorySlug) => {
   });
 };
 
+const mailService = require('./mail.service');
+
 exports.submitContact = async (data) => {
   const { name, email, phone, subject, message } = data;
   if (!name || !email || !message) {
@@ -132,7 +134,8 @@ exports.submitContact = async (data) => {
     err.statusCode = 400;
     throw err;
   }
-  return await prisma.contactMessage.create({
+
+  const record = await prisma.contactMessage.create({
     data: {
       name: String(name),
       email: String(email),
@@ -142,4 +145,62 @@ exports.submitContact = async (data) => {
       status: 'unread',
     },
   });
+
+  try {
+    await mailService.sendContactNotification({
+      name: record.name,
+      email: record.email,
+      phone: record.phone,
+      subject: record.subject,
+      message: record.message,
+    });
+  } catch (mailErr) {
+    console.error('[mail] contact notification failed:', mailErr.message);
+  }
+
+  return record;
+};
+
+exports.submitCareersApplication = async (body, cvFile) => {
+  const name = String(body.name || '').trim();
+  const email = String(body.email || '').trim();
+  const phone = body.phone ? String(body.phone).trim() : null;
+  const position = body.position ? String(body.position).trim() : null;
+  const message = body.message ? String(body.message).trim() : '';
+
+  if (!name || !email) {
+    const err = new Error('Name and email are required');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const subject = position ? `Careers: ${position}` : 'Careers application';
+  const fullMessage = [
+    message,
+    cvFile?.originalname ? `\n\nCV file: ${cvFile.originalname}` : '',
+  ]
+    .join('')
+    .trim() || '(no additional message)';
+
+  const record = await prisma.contactMessage.create({
+    data: {
+      name,
+      email,
+      phone,
+      subject,
+      message: fullMessage,
+      status: 'unread',
+    },
+  });
+
+  try {
+    await mailService.sendCareersNotification(
+      { name, email, phone, position, message: fullMessage },
+      cvFile
+    );
+  } catch (mailErr) {
+    console.error('[mail] careers notification failed:', mailErr.message);
+  }
+
+  return record;
 };

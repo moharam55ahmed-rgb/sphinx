@@ -52,7 +52,7 @@ async function main() {
 
   const settingsData = [
     { key: 'phone', group: 'contact', value: { text: '19474' } },
-    { key: 'email', group: 'contact', value: { text: 'marketing@aswaqdev.com' } },
+    { key: 'email', group: 'contact', value: { text: 'info@citysphinx.com' } },
     { key: 'addressAr', group: 'contact', value: { text: 'فيلا 1/127 ملتقى النسور - شيراتون - مصر الجديدة - القاهرة' } },
     { key: 'addressEn', group: 'contact', value: { text: 'Villa 1/127, Moltaqa El-Nesour, Sheraton, Heliopolis, Cairo, Egypt' } },
     { key: 'whatsapp', group: 'contact', value: { text: '+201000000000' } },

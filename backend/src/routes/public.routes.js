@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/public.controller');
+const { upload } = require('../middlewares/upload.middleware');
 
 router.get('/home', controller.getHomeData);
 router.get('/pages/:slug', controller.getPageBySlug);
@@ -16,6 +17,7 @@ router.get('/news-categories', controller.getNewsCategories);
 router.get('/gallery-categories', controller.getGalleryCategories);
 router.get('/gallery', controller.getGallery);
 router.post('/contact', controller.submitContact);
+router.post('/careers', upload.single('cv'), controller.submitCareers);
 router.post('/analytics/visit', controller.recordVisit);
 
 module.exports = router;
