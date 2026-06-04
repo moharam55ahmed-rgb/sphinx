@@ -11,7 +11,8 @@
     "dev": "nodemon src/server.js",
     "seed": "node prisma/seed.js",
     "db:push": "prisma db push",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "test:mail": "node scripts/test-mail.js"
   },
   "keywords": [],
   "author": "",
