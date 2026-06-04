@@ -12,6 +12,10 @@ module.exports = {
   backendUrl: process.env.BACKEND_URL || 'http://localhost:5000',
   mail: {
     notifyTo: process.env.NOTIFY_EMAIL || 'info@citysphinx.com',
+    contactTo:
+      process.env.CONTACT_NOTIFY_EMAIL ||
+      process.env.NOTIFY_EMAIL ||
+      'info@citysphinx.com',
     careersTo:
       process.env.CAREERS_NOTIFY_EMAIL ||
       process.env.NOTIFY_EMAIL ||

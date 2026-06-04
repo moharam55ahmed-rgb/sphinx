@@ -87,7 +87,7 @@ exports.sendContactNotification = async (payload) => {
     subject: `[City Sphinx] ${title}`,
     html,
     text,
-    to: env.mail.notifyTo,
+    to: env.mail.contactTo,
     replyTo: email,
   });
 };
