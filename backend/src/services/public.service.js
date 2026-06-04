@@ -1,5 +1,6 @@
 
 const prisma = require('../config/prisma');
+const env = require('../config/env');
 
 exports.getHomeData = async () => {
   const sections = await prisma.pageSection.findMany({
@@ -193,14 +194,24 @@ exports.submitCareersApplication = async (body, cvFile) => {
     },
   });
 
+  if (cvFile) {
+    console.log('[careers] CV received:', cvFile.originalname, cvFile.path, cvFile.size);
+  }
+
+  let mail = { sent: false, reason: 'not_attempted', cvAttached: false };
   try {
-    await mailService.sendCareersNotification(
+    mail = await mailService.sendCareersNotification(
       { name, email, phone, position, message: fullMessage },
       cvFile
     );
+    mail.cvAttached = Boolean(cvFile?.path);
+    if (!mail.sent) {
+      console.warn('[mail] careers notification skipped:', mail.reason, '→', env.mail.careersTo);
+    }
   } catch (mailErr) {
     console.error('[mail] careers notification failed:', mailErr.message);
+    mail = { sent: false, reason: mailErr.message, cvAttached: false };
   }
 
-  return record;
+  return { record, mail };
 };

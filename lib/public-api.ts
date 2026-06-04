@@ -74,10 +74,18 @@ export const submitContactForm = async (data: {
 };
 
 export const submitCareersForm = async (formData: FormData) => {
-  const res = await publicApi.post('/public/careers', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+  // fetch + FormData: browser sets multipart boundary (axios default JSON header breaks CV upload)
+  const res = await fetch(`${getApiBaseUrl()}/public/careers`, {
+    method: 'POST',
+    body: formData,
   });
-  return res.data;
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(
+      (json as { message?: string }).message || `Careers submit failed (${res.status})`
+    );
+  }
+  return json;
 };
 
 export const trackPageVisit = async (data: {

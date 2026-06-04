@@ -12,7 +12,8 @@
     "seed": "node prisma/seed.js",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
-    "test:mail": "node scripts/test-mail.js"
+    "test:mail": "node scripts/test-mail.js",
+    "test:mail:careers": "node scripts/test-mail-careers.js"
   },
   "keywords": [],
   "author": "",

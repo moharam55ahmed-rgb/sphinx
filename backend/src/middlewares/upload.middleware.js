@@ -20,6 +20,8 @@ const storage = multer.diskStorage({
   }
 });
 
+const CV_EXTENSIONS = new Set(['.pdf', '.doc', '.docx']);
+
 const fileFilter = (req, file, cb) => {
   const allowedMimes = [
     'image/jpeg',
@@ -42,12 +44,36 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+/** Careers CV — allow PDF/DOC by extension (browsers often send application/octet-stream) */
+const careersCvFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname || '').toLowerCase();
+  const okMime = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/octet-stream',
+    'binary/octet-stream',
+  ].includes(file.mimetype);
+
+  if (CV_EXTENSIONS.has(ext) && (okMime || file.mimetype === '')) {
+    cb(null, true);
+    return;
+  }
+  cb(new Error('CV must be a PDF, DOC, or DOCX file (max 10MB).'));
+};
+
 const upload = multer({
   storage,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },
-  fileFilter
+  fileFilter,
 });
 
-module.exports = { upload };
+const careersUpload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: careersCvFilter,
+});
+
+module.exports = { upload, careersUpload };
