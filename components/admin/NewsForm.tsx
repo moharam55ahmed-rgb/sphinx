@@ -39,15 +39,24 @@ export function NewsForm({ initialData }: { initialData?: any }) {
       .catch(() => setCategories([]));
   }, []);
 
+  const buildPayload = () => {
+    const dateValue = formData.publishedAt?.split('T')[0] || new Date().toISOString().split('T')[0];
+    return {
+      ...formData,
+      publishedAt: `${dateValue}T00:00:00.000Z`,
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const payload = buildPayload();
       if (isEdit) {
-        await apiClient.put(`/news/${initialData.id}`, formData);
+        await apiClient.put(`/news/${initialData.id}`, payload);
         toast.success("Article updated");
       } else {
-        await apiClient.post('/news', formData);
+        await apiClient.post('/news', payload);
         toast.success("Article created");
       }
       router.push(adminPath('/admin/news'));

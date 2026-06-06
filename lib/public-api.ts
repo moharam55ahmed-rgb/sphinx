@@ -58,8 +58,11 @@ export const getSeoBySlug = async (slug: string) => {
 };
 
 export const getNewsBySlug = async (slug: string) => {
-  const res = await publicApi.get(`/public/news/${slug}`);
-  return res.data.data;
+  try {
+    return await cmsFetch<any>(`/public/news/${slug}`);
+  } catch {
+    return null;
+  }
 };
 
 export const submitContactForm = async (data: {
@@ -105,8 +108,11 @@ export const getGalleryCategories = async () => {
 };
 
 export const getNews = async (params?: { limit?: number; category?: string }) => {
-  const res = await publicApi.get('/public/news', { params });
-  return res.data.data;
+  const qs = new URLSearchParams();
+  if (params?.limit != null) qs.set('limit', String(params.limit));
+  if (params?.category) qs.set('category', params.category);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return cmsFetch<any[]>(`/public/news${suffix}`);
 };
 
 export default publicApi;

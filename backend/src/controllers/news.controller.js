@@ -19,12 +19,18 @@ const getNewsItem = async (req, res) => {
   }
 };
 
+const formatNewsError = (err) => {
+  if (err.code === 'P2002') return 'This slug is already used by another article. Please choose a different slug.';
+  if (err.message?.includes('publishedAt')) return 'Invalid publish date. Please pick a valid date.';
+  return err.message;
+};
+
 const createNews = async (req, res) => {
   try {
     const item = await newsService.create(req.body);
     res.status(201).json({ success: true, data: item });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: formatNewsError(err) });
   }
 };
 
@@ -33,7 +39,7 @@ const updateNews = async (req, res) => {
     const item = await newsService.update(req.params.id, req.body);
     res.json({ success: true, data: item });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: formatNewsError(err) });
   }
 };
 

@@ -12,7 +12,6 @@ import { PageHero } from '@/components/shared/PageHero';
 import { AnimatedReveal } from '@/components/shared/AnimatedReveal';
 import { CTASection } from '@/components/shared/CTASection';
 import { cn } from '@/lib/utils';
-import { news as staticNews } from '@/data/site';
 import { getNews, getNewsCategories, getPageBySlug } from '@/lib/public-api';
 import { getBannerImage } from '@/lib/page-banners';
 import { t as translate } from '@/lib/translate';
@@ -81,13 +80,14 @@ export function NewsListing() {
         ]);
         const hero = getBannerImage(page?.sections, 'news-hero');
         if (hero) setHeroImage(hero);
-        if (data?.length) {
-          setNewsItems(data.map((item: any) => normalizeNewsItem(item, locale)));
-        } else {
-          setNewsItems(staticNews.map((item) => normalizeNewsItem(item, locale)));
-        }
-      } catch {
-        setNewsItems(staticNews.map((item) => normalizeNewsItem(item, locale)));
+        setNewsItems(
+          Array.isArray(data)
+            ? data.map((item: any) => normalizeNewsItem(item, locale))
+            : []
+        );
+      } catch (err) {
+        console.error('Failed to fetch news', err);
+        setNewsItems([]);
       } finally {
         setLoading(false);
       }

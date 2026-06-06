@@ -37,8 +37,11 @@ export function LatestNewsSection({ data }: { data?: any }) {
     fetch();
   }, []);
 
-  const displayNews =
-    dynamicNews.length > 0 ? dynamicNews : data?.items ?? [];
+  const displayNews = dynamicNews;
+
+  if (!loading && displayNews.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-24">

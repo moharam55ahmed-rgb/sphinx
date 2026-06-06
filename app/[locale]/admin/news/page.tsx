@@ -15,7 +15,7 @@ export default function NewsList() {
 
   const fetchNews = async () => {
     try {
-      const res = await apiClient.get('/news');
+      const res = await apiClient.get('/news?limit=100');
       setData(res.data.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load news');

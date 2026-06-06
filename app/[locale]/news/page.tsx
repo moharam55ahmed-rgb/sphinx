@@ -1,6 +1,8 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { NewsListing } from './NewsListing';
 
+export const revalidate = 0;
+
 type Props = {
   params: Promise<{ locale: string }>;
 };
