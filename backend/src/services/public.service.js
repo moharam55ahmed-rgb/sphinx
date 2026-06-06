@@ -1,5 +1,6 @@
 
 const prisma = require('../config/prisma');
+const env = require('../config/env');
 
 exports.getHomeData = async () => {
   const sections = await prisma.pageSection.findMany({
@@ -146,19 +147,24 @@ exports.submitContact = async (data) => {
     },
   });
 
+  let mail = { sent: false, reason: 'not_attempted' };
   try {
-    await mailService.sendContactNotification({
+    mail = await mailService.sendContactNotification({
       name: record.name,
       email: record.email,
       phone: record.phone,
       subject: record.subject,
       message: record.message,
     });
+    if (!mail.sent) {
+      console.warn('[mail] contact notification skipped:', mail.reason, '→', env.mail.contactTo);
+    }
   } catch (mailErr) {
     console.error('[mail] contact notification failed:', mailErr.message);
+    mail = { sent: false, reason: mailErr.message };
   }
 
-  return record;
+  return { record, mail };
 };
 
 exports.submitCareersApplication = async (body, cvFile) => {
@@ -193,14 +199,24 @@ exports.submitCareersApplication = async (body, cvFile) => {
     },
   });
 
+  if (cvFile) {
+    console.log('[careers] CV received:', cvFile.originalname, cvFile.path, cvFile.size);
+  }
+
+  let mail = { sent: false, reason: 'not_attempted', cvAttached: false };
   try {
-    await mailService.sendCareersNotification(
+    mail = await mailService.sendCareersNotification(
       { name, email, phone, position, message: fullMessage },
       cvFile
     );
+    mail.cvAttached = Boolean(cvFile?.path);
+    if (!mail.sent) {
+      console.warn('[mail] careers notification skipped:', mail.reason, '→', env.mail.careersTo);
+    }
   } catch (mailErr) {
     console.error('[mail] careers notification failed:', mailErr.message);
+    mail = { sent: false, reason: mailErr.message, cvAttached: false };
   }
 
-  return record;
+  return { record, mail };
 };
